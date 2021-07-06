@@ -32,12 +32,12 @@ func newClient(config *pangu.Config) (client *Client, err error) {
 	}))
 
 	connections := make(map[string]*grpc.ClientConn)
-	for _, client := range grpcConfig.Clients {
+	for _, clientConfig := range grpcConfig.Clients {
 		var connection *grpc.ClientConn
-		if connection, err = grpc.Dial(client.Addr, options...); nil != err {
+		if connection, err = grpc.Dial(clientConfig.Addr, options...); nil != err {
 			return
 		}
-		connections[client.Name] = connection
+		connections[clientConfig.Name] = connection
 	}
 	client = &Client{
 		connections: connections,
