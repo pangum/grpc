@@ -6,6 +6,7 @@ import (
 	`github.com/storezhang/pangu`
 	`google.golang.org/grpc`
 	`google.golang.org/grpc/keepalive`
+	`google.golang.org/grpc/reflection`
 )
 
 // Server gRPC服务器封装
@@ -44,16 +45,26 @@ func newServer(config *pangu.Config) (server *Server, err error) {
 	return
 }
 
-func (s *Server) Serve(functions ...registerFunc) (err error) {
+func (s *Server) Serve(fun registerFunc, opts ...serveOption) (err error) {
+	options := defaultServeOptions()
+	for _, opt := range opts {
+		opt.apply(options)
+	}
+
 	var listener net.Listener
 	if listener, err = net.Listen("tcp", s.config.Addr()); nil != err {
 		return
 	}
 
 	// 注册服务
-	for _, function := range functions {
-		function(s)
+	fun(s)
+
+	// 处理选项
+	if options.Reflection {
+		reflection.Register(s.grpc)
 	}
+
+	// 启动服务
 	err = s.grpc.Serve(listener)
 
 	return
