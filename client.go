@@ -37,7 +37,13 @@ func newClient(config *pangu.Config) (client *Client, err error) {
 		if connection, err = grpc.Dial(clientConfig.Addr, options...); nil != err {
 			return
 		}
-		connections[clientConfig.Name] = connection
+
+		if "" != clientConfig.Name {
+			connections[clientConfig.Name] = connection
+		}
+		for _, name := range clientConfig.Names {
+			connections[name] = connection
+		}
 	}
 	client = &Client{
 		connections: connections,
