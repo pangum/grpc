@@ -3,6 +3,8 @@ package grpc
 import (
 	`net`
 
+	`github.com/storezhang/glog`
+	`github.com/storezhang/gox/field`
 	`github.com/storezhang/pangu`
 	`google.golang.org/grpc`
 	`google.golang.org/grpc/keepalive`
@@ -13,9 +15,11 @@ import (
 type Server struct {
 	grpc   *grpc.Server
 	config serverConfig
+
+	logger glog.Logger
 }
 
-func newServer(config *pangu.Config) (server *Server, err error) {
+func newServer(config *pangu.Config, logger glog.Logger) (server *Server, err error) {
 	panguConfig := new(panguConfig)
 	if err = config.Load(panguConfig); nil != err {
 		return
@@ -40,6 +44,8 @@ func newServer(config *pangu.Config) (server *Server, err error) {
 	server = &Server{
 		grpc:   grpc.NewServer(options...),
 		config: grpcConfig.Server,
+
+		logger: logger,
 	}
 
 	return
@@ -64,6 +70,7 @@ func (s *Server) Serve(fun registerFunc, opts ...serveOption) (err error) {
 		reflection.Register(s.grpc)
 	}
 
+	s.logger.Info("启动gRPC服务器", field.Int("port", s.config.Port))
 	// 启动服务
 	err = s.grpc.Serve(listener)
 
@@ -72,4 +79,8 @@ func (s *Server) Serve(fun registerFunc, opts ...serveOption) (err error) {
 
 func (s *Server) Server() *grpc.Server {
 	return s.grpc
+}
+
+func (s *Server) Stop() {
+	s.grpc.GracefulStop()
 }
