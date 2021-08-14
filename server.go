@@ -63,7 +63,7 @@ func (s *Server) Serve(fun registerFunc, opts ...serveOption) (err error) {
 	}
 
 	// 注册服务
-	fun(s)
+	fun()
 
 	// 处理选项
 	if options.Reflection {
@@ -77,7 +77,7 @@ func (s *Server) Serve(fun registerFunc, opts ...serveOption) (err error) {
 	return
 }
 
-func (s *Server) Server() *grpc.Server {
+func (s *Server) Grpc() *grpc.Server {
 	return s.grpc
 }
 
