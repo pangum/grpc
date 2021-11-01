@@ -1,7 +1,7 @@
 package grpc
 
 import (
-	`github.com/storezhang/pangu`
+	`github.com/pangum/pangu`
 	`google.golang.org/grpc`
 	`google.golang.org/grpc/keepalive`
 )
@@ -12,36 +12,36 @@ type Client struct {
 }
 
 func newClient(config *pangu.Config) (client *Client, err error) {
-	panguConfig := new(panguConfig)
-	if err = config.Load(panguConfig); nil != err {
+	_panguConfig := new(panguConfig)
+	if err = config.Load(_panguConfig); nil != err {
 		return
 	}
 
 	// 组织配置项
-	grpcConfig := panguConfig.Grpc
-	options := make([]grpc.DialOption, 0, 8)
-	options = append(options, grpc.WithInsecure())
-	options = append(options, grpc.WithInitialWindowSize(grpcConfig.Options.Size.Window.Initial))
-	options = append(options, grpc.WithInitialConnWindowSize(grpcConfig.Options.Size.Window.Connection))
-	options = append(options, grpc.WithDefaultCallOptions(grpc.MaxCallSendMsgSize(grpcConfig.Options.Size.Msg.Send)))
-	options = append(options, grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(grpcConfig.Options.Size.Msg.Receive)))
-	options = append(options, grpc.WithKeepaliveParams(keepalive.ClientParameters{
+	grpcConfig := _panguConfig.Grpc
+	_options := make([]grpc.DialOption, 0, 8)
+	_options = append(_options, grpc.WithInsecure())
+	_options = append(_options, grpc.WithInitialWindowSize(grpcConfig.Options.Size.Window.Initial))
+	_options = append(_options, grpc.WithInitialConnWindowSize(grpcConfig.Options.Size.Window.Connection))
+	_options = append(_options, grpc.WithDefaultCallOptions(grpc.MaxCallSendMsgSize(grpcConfig.Options.Size.Msg.Send)))
+	_options = append(_options, grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(grpcConfig.Options.Size.Msg.Receive)))
+	_options = append(_options, grpc.WithKeepaliveParams(keepalive.ClientParameters{
 		Time:                grpcConfig.Options.Keepalive.Time,
 		Timeout:             grpcConfig.Options.Keepalive.Timeout,
 		PermitWithoutStream: grpcConfig.Options.Keepalive.Policy.Permit,
 	}))
 
 	connections := make(map[string]*grpc.ClientConn)
-	for _, clientConfig := range grpcConfig.Clients {
+	for _, _clientConfig := range grpcConfig.Clients {
 		var connection *grpc.ClientConn
-		if connection, err = grpc.Dial(clientConfig.Addr, options...); nil != err {
+		if connection, err = grpc.Dial(_clientConfig.Addr, _options...); nil != err {
 			return
 		}
 
-		if "" != clientConfig.Name {
-			connections[clientConfig.Name] = connection
+		if "" != _clientConfig.Name {
+			connections[_clientConfig.Name] = connection
 		}
-		for _, name := range clientConfig.Names {
+		for _, name := range _clientConfig.Names {
 			connections[name] = connection
 		}
 	}
