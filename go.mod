@@ -3,7 +3,7 @@ module github.com/pangum/grpc
 go 1.16
 
 require (
-	github.com/pangum/logging v0.0.1
+	github.com/pangum/logging v0.0.2
 	github.com/pangum/pangu v0.0.1
 	github.com/storezhang/gox v1.7.9
 	golang.org/x/net v0.0.0-20211029224645-99673261e6eb // indirect
