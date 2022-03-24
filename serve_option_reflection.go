@@ -1,6 +1,9 @@
 package grpc
 
-var _ serveOption = (*serveOptionReflection)(nil)
+var (
+	_             = DisableReflection
+	_ serveOption = (*serveOptionReflection)(nil)
+)
 
 type serveOptionReflection struct{}
 

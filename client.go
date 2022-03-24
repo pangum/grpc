@@ -1,6 +1,7 @@
 package grpc
 
 import (
+	`github.com/goexl/gox`
 	`github.com/pangum/pangu`
 	`google.golang.org/grpc`
 	`google.golang.org/grpc/keepalive`
@@ -9,6 +10,8 @@ import (
 // Client gRPC客户端封装
 type Client struct {
 	connections map[string]*grpc.ClientConn
+
+	_ gox.CannotCopy
 }
 
 func newClient(config *pangu.Config) (client *Client, err error) {

@@ -1,1 +1,1 @@
-# pangu-grpc
+# grpc
