@@ -1,14 +1,14 @@
 package grpc
 
 import (
-	`net`
+	"net"
 
-	`github.com/goexl/gox/field`
-	`github.com/pangum/logging`
-	`github.com/pangum/pangu`
-	`google.golang.org/grpc`
-	`google.golang.org/grpc/keepalive`
-	`google.golang.org/grpc/reflection`
+	"github.com/goexl/gox/field"
+	"github.com/pangum/logging"
+	"github.com/pangum/pangu"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/keepalive"
+	"google.golang.org/grpc/reflection"
 )
 
 // Server gRPC服务器封装
@@ -51,7 +51,7 @@ func newServer(config *pangu.Config, logger *logging.Logger) (server *Server, er
 	return
 }
 
-func (s *Server) Serve(fun registerFunc, opts ...serveOption) (err error) {
+func (s *Server) Serve(register register, opts ...serveOption) (err error) {
 	_options := defaultServeOptions()
 	for _, opt := range opts {
 		opt.apply(_options)
@@ -63,7 +63,7 @@ func (s *Server) Serve(fun registerFunc, opts ...serveOption) (err error) {
 	}
 
 	// 注册服务
-	fun()
+	register.Grpc(s.grpc)
 
 	// 处理选项
 	if _options.Reflection {
@@ -75,10 +75,6 @@ func (s *Server) Serve(fun registerFunc, opts ...serveOption) (err error) {
 	err = s.grpc.Serve(listener)
 
 	return
-}
-
-func (s *Server) Grpc() *grpc.Server {
-	return s.grpc
 }
 
 func (s *Server) Stop() {

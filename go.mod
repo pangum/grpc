@@ -4,10 +4,10 @@ go 1.18
 
 require (
 	github.com/goexl/gox v0.1.2
-	github.com/pangum/logging v0.1.6
-	github.com/pangum/pangu v0.2.3
+	github.com/pangum/logging v0.1.7
+	github.com/pangum/pangu v0.2.4
 	golang.org/x/net v0.1.0 // indirect
-	google.golang.org/genproto v0.0.0-20220323144105-ec3c684e5b14 // indirect
+	google.golang.org/genproto v0.0.0-20221025140454-527a21cfbd71 // indirect
 	google.golang.org/grpc v1.50.1
 	google.golang.org/protobuf v1.28.1 // indirect
 )
