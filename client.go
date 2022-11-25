@@ -26,8 +26,10 @@ func newClient(config *pangu.Config) (client *Client, err error) {
 	_options = append(_options, grpc.WithInsecure())
 	_options = append(_options, grpc.WithInitialWindowSize(int32(_config.Options.Size.Window.Initial)))
 	_options = append(_options, grpc.WithInitialConnWindowSize(int32(_config.Options.Size.Window.Connection)))
-	_options = append(_options, grpc.WithDefaultCallOptions(grpc.MaxCallSendMsgSize(_config.Options.Size.Msg.Send)))
-	_options = append(_options, grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(_config.Options.Size.Msg.Receive)))
+	// nolint:lll
+	_options = append(_options, grpc.WithDefaultCallOptions(grpc.MaxCallSendMsgSize(int(_config.Options.Size.Msg.Send))))
+	// nolint:lll
+	_options = append(_options, grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(int(_config.Options.Size.Msg.Receive))))
 	_options = append(_options, grpc.WithKeepaliveParams(keepalive.ClientParameters{
 		Time:                _config.Options.Keepalive.Time,
 		Timeout:             _config.Options.Keepalive.Timeout,
@@ -35,16 +37,16 @@ func newClient(config *pangu.Config) (client *Client, err error) {
 	}))
 
 	connections := make(map[string]*grpc.ClientConn)
-	for _, _clientConfig := range _config.Clients {
+	for _, conf := range _config.Clients {
 		var connection *grpc.ClientConn
-		if connection, err = grpc.Dial(_clientConfig.Addr, _options...); nil != err {
+		if connection, err = grpc.Dial(conf.Addr, _options...); nil != err {
 			return
 		}
 
-		if "" != _clientConfig.Name {
-			connections[_clientConfig.Name] = connection
+		if "" != conf.Name {
+			connections[conf.Name] = connection
 		}
-		for _, name := range _clientConfig.Names {
+		for _, name := range conf.Names {
 			connections[name] = connection
 		}
 	}

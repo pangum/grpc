@@ -3,9 +3,9 @@ module github.com/pangum/grpc
 go 1.18
 
 require (
-	github.com/goexl/gox v0.1.4
+	github.com/goexl/gox v0.1.6
 	github.com/pangum/logging v0.1.8
-	github.com/pangum/pangu v0.2.8
+	github.com/pangum/pangu v0.2.9
 	golang.org/x/net v0.2.0 // indirect
 	google.golang.org/genproto v0.0.0-20221118155620-16455021b5e6 // indirect
 	google.golang.org/grpc v1.51.0
@@ -23,9 +23,9 @@ require (
 	github.com/goexl/env v0.0.2 // indirect
 	github.com/goexl/exc v0.0.5 // indirect
 	github.com/goexl/gfx v0.1.6 // indirect
-	github.com/goexl/mengpo v0.2.2 // indirect
+	github.com/goexl/mengpo v0.2.3 // indirect
 	github.com/goexl/simaqian v0.2.0 // indirect
-	github.com/goexl/xiren v0.0.4 // indirect
+	github.com/goexl/xiren v0.0.5 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect

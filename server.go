@@ -30,8 +30,8 @@ func newServer(config *pangu.Config, logger *logging.Logger) (server *Server, er
 	_options := make([]grpc.ServerOption, 0, 8)
 	_options = append(_options, grpc.InitialWindowSize(int32(_config.Options.Size.Window.Initial)))
 	_options = append(_options, grpc.InitialConnWindowSize(int32(_config.Options.Size.Window.Connection)))
-	_options = append(_options, grpc.MaxSendMsgSize(_config.Options.Size.Msg.Send))
-	_options = append(_options, grpc.MaxRecvMsgSize(_config.Options.Size.Msg.Receive))
+	_options = append(_options, grpc.MaxSendMsgSize(int(_config.Options.Size.Msg.Send)))
+	_options = append(_options, grpc.MaxRecvMsgSize(int(_config.Options.Size.Msg.Receive)))
 	_options = append(_options, grpc.KeepaliveEnforcementPolicy(keepalive.EnforcementPolicy{
 		PermitWithoutStream: _config.Options.Keepalive.Policy.Permit,
 	}))
