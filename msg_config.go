@@ -1,6 +1,6 @@
 package grpc
 
-type msgConfig struct {
+type msg struct {
 	// 发送大小
 	// 4GB
 	Send int `default:"4294967296" json:"send" yaml:"send" xml:"send" toml:"send"`

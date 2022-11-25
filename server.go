@@ -14,7 +14,7 @@ import (
 // Server gRPC服务器封装
 type Server struct {
 	grpc   *grpc.Server
-	config serverConfig
+	config server
 
 	logger *logging.Logger
 }
@@ -26,24 +26,24 @@ func newServer(config *pangu.Config, logger *logging.Logger) (server *Server, er
 	}
 
 	// 组织配置项
-	grpcConfig := _panguConfig.Grpc
+	_config := _panguConfig.Grpc
 	_options := make([]grpc.ServerOption, 0, 8)
-	_options = append(_options, grpc.InitialWindowSize(grpcConfig.Options.Size.Window.Initial))
-	_options = append(_options, grpc.InitialConnWindowSize(grpcConfig.Options.Size.Window.Connection))
-	_options = append(_options, grpc.MaxSendMsgSize(grpcConfig.Options.Size.Msg.Send))
-	_options = append(_options, grpc.MaxRecvMsgSize(grpcConfig.Options.Size.Msg.Receive))
+	_options = append(_options, grpc.InitialWindowSize(int32(_config.Options.Size.Window.Initial)))
+	_options = append(_options, grpc.InitialConnWindowSize(int32(_config.Options.Size.Window.Connection)))
+	_options = append(_options, grpc.MaxSendMsgSize(_config.Options.Size.Msg.Send))
+	_options = append(_options, grpc.MaxRecvMsgSize(_config.Options.Size.Msg.Receive))
 	_options = append(_options, grpc.KeepaliveEnforcementPolicy(keepalive.EnforcementPolicy{
-		PermitWithoutStream: grpcConfig.Options.Keepalive.Policy.Permit,
+		PermitWithoutStream: _config.Options.Keepalive.Policy.Permit,
 	}))
 	_options = append(_options, grpc.KeepaliveParams(keepalive.ServerParameters{
-		MaxConnectionIdle: grpcConfig.Options.Keepalive.Idle,
-		Time:              grpcConfig.Options.Keepalive.Time,
-		Timeout:           grpcConfig.Options.Keepalive.Timeout,
+		MaxConnectionIdle: _config.Options.Keepalive.Idle,
+		Time:              _config.Options.Keepalive.Time,
+		Timeout:           _config.Options.Keepalive.Timeout,
 	}))
 
 	server = &Server{
 		grpc:   grpc.NewServer(_options...),
-		config: grpcConfig.Server,
+		config: _config.Server,
 
 		logger: logger,
 	}
@@ -70,7 +70,7 @@ func (s *Server) Serve(register register, opts ...serveOption) (err error) {
 		reflection.Register(s.grpc)
 	}
 
-	s.logger.Info("启动gRPC服务器", field.Int("port", s.config.Port))
+	s.logger.Info("启动gRPC服务器", field.New("port", s.config.Port))
 	// 启动服务
 	err = s.grpc.Serve(listener)
 

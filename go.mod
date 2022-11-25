@@ -7,7 +7,7 @@ require (
 	github.com/pangum/logging v0.1.8
 	github.com/pangum/pangu v0.2.8
 	golang.org/x/net v0.2.0 // indirect
-	google.golang.org/genproto v0.0.0-20221025140454-527a21cfbd71 // indirect
+	google.golang.org/genproto v0.0.0-20221118155620-16455021b5e6 // indirect
 	google.golang.org/grpc v1.51.0
 	google.golang.org/protobuf v1.28.1 // indirect
 )
