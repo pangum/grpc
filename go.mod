@@ -1,6 +1,6 @@
 module github.com/pangum/grpc
 
-go 1.18
+go 1.19
 
 require (
 	github.com/goexl/gox v0.1.6
