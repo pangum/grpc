@@ -119,7 +119,7 @@ func (s *Server) setupGateway(register register) (err error) {
 		return
 	}
 
-	gateway := runtime.NewServeMux()
+	gateway := runtime.NewServeMux(s.config.Gateway.options()...)
 	opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
 	if err = register.Gateway(gateway, s.config.Addr(), opts...); nil != err {
 		return
