@@ -8,9 +8,10 @@ import (
 // Register 空白注册器
 type Register struct{}
 
-func (r *Register) Grpc(server *grpc.Server) {}
+func (r *Register) Grpc(_ *grpc.Server) {}
 
-func (r *Register) Gateway(mux *runtime.ServeMux, endpoint string, opts ...grpc.DialOption) (err error) {
+func (r *Register) Gateway(_ *runtime.ServeMux, _ string, _ ...grpc.DialOption) (err error) {
+	return
 }
 
 type register interface {
