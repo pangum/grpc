@@ -1,0 +1,14 @@
+grpc:
+  server:
+    port: 9001
+    gateway:
+      enabled: true
+      json:
+        multiline: false
+        indent: ""
+        partial: false
+        unpopulated: false
+        discard: false
+        options:
+          - enum_as_numbers
+          - name_as_proto

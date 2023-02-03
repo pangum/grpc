@@ -10,7 +10,7 @@ type json struct {
 	// 选项列表
 	Options []string `json:"options" yaml:"options" xml:"options" toml:"options"`
 	// 是否允许不填充
-	Unpopulated bool `json:"unpopulated" yaml:"unpopulated" xml:"unpopulated" toml:"unpopulated"`
+	Unpopulated *bool `default:"true" json:"unpopulated" yaml:"unpopulated" xml:"unpopulated" toml:"unpopulated"`
 	// 是否允许丢弃
-	Discard bool `json:"discard" yaml:"discard" xml:"discard" toml:"discard"`
+	Discard *bool `default:"true" json:"discard" yaml:"discard" xml:"discard" toml:"discard"`
 }
