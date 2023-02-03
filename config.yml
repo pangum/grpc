@@ -7,8 +7,8 @@ grpc:
         multiline: false
         indent: ""
         partial: false
-        unpopulated: false
-        discard: false
+        unpopulated: true
+        discard: true
         options:
           - enum_as_numbers
           - name_as_proto
