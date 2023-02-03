@@ -1,6 +1,7 @@
 package grpc
 
 import (
+	"github.com/goexl/gox"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/protobuf/encoding/protojson"
 )
@@ -19,8 +20,8 @@ func (g *gateway) options() (options []runtime.ServeMuxOption) {
 			Multiline:       g.Json.Multiline,
 			Indent:          g.Json.Indent,
 			AllowPartial:    g.Json.Partial,
-			UseProtoNames:   false,
-			UseEnumNumbers:  false,
+			UseProtoNames:   gox.Contains(&g.Json.Options, nameAsProto),
+			UseEnumNumbers:  gox.Contains(&g.Json.Options, enumAsNumbers),
 			EmitUnpopulated: g.Json.Unpopulated,
 		},
 		UnmarshalOptions: protojson.UnmarshalOptions{

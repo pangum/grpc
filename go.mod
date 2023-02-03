@@ -3,13 +3,13 @@ module github.com/pangum/grpc
 go 1.19
 
 require (
-	github.com/goexl/gox v0.1.6
+	github.com/goexl/gox v0.1.7
 	github.com/pangum/logging v0.1.9
 	github.com/pangum/pangu v0.3.1
 	golang.org/x/net v0.5.0
-	google.golang.org/genproto v0.0.0-20230131230820-1c016267d619 // indirect
+	google.golang.org/genproto v0.0.0-20230202175211-008b39050e57 // indirect
 	google.golang.org/grpc v1.52.3
-	google.golang.org/protobuf v1.28.1 // indirect
+	google.golang.org/protobuf v1.28.1
 )
 
 require github.com/grpc-ecosystem/grpc-gateway/v2 v2.15.0
@@ -37,7 +37,7 @@ require (
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/sirupsen/logrus v1.9.0 // indirect
 	github.com/storezhang/dig v0.0.1 // indirect
-	github.com/urfave/cli/v2 v2.24.2 // indirect
+	github.com/urfave/cli/v2 v2.24.3 // indirect
 	github.com/xrash/smetrics v0.0.0-20201216005158-039620a65673 // indirect
 	github.com/zs5460/art v0.2.0 // indirect
 	go.uber.org/atomic v1.10.0 // indirect
