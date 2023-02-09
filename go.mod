@@ -6,7 +6,7 @@ require (
 	github.com/goexl/gox v0.1.7
 	github.com/pangum/logging v0.1.9
 	github.com/pangum/pangu v0.3.1
-	golang.org/x/net v0.5.0
+	golang.org/x/net v0.6.0
 	google.golang.org/genproto v0.0.0-20230202175211-008b39050e57 // indirect
 	google.golang.org/grpc v1.53.0
 	google.golang.org/protobuf v1.28.1
@@ -44,7 +44,7 @@ require (
 	go.uber.org/multierr v1.9.0 // indirect
 	go.uber.org/zap v1.24.0 // indirect
 	golang.org/x/crypto v0.5.0 // indirect
-	golang.org/x/sys v0.4.0 // indirect
-	golang.org/x/text v0.6.0 // indirect
+	golang.org/x/sys v0.5.0 // indirect
+	golang.org/x/text v0.7.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
