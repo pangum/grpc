@@ -4,16 +4,11 @@ import (
 	"context"
 	"net"
 	"net/http"
-	"strings"
 
 	"github.com/goexl/gox/field"
-	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/pangum/logging"
 	"github.com/pangum/pangu"
-	"golang.org/x/net/http2"
-	"golang.org/x/net/http2/h2c"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/keepalive"
 	"google.golang.org/grpc/reflection"
 )
@@ -91,7 +86,7 @@ func (s *Server) Serve(register register, opts ...serveOption) (err error) {
 }
 
 func (s *Server) Stop() {
-	if s.config.gateway() {
+	if s.config.gatewayEnabled() {
 		_ = s.gateway.Shutdown(context.Background())
 	} else {
 		s.grpc.GracefulStop()
@@ -99,7 +94,7 @@ func (s *Server) Stop() {
 }
 
 func (s *Server) startup(listener net.Listener) (err error) {
-	if s.config.gateway() {
+	if s.config.gatewayEnabled() {
 		err = s.gateway.Serve(listener)
 	} else {
 		err = s.grpc.Serve(listener)
@@ -112,35 +107,4 @@ func (s *Server) setupGrpc(register register) (err error) {
 	register.Grpc(s.grpc)
 
 	return
-}
-
-func (s *Server) setupGateway(register register) (err error) {
-	if !s.config.gateway() {
-		return
-	}
-
-	gateway := runtime.NewServeMux(s.config.Gateway.options()...)
-	opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
-	if err = register.Gateway(gateway, s.config.Addr(), opts...); nil != err {
-		return
-	}
-
-	mux := http.NewServeMux()
-	mux.Handle("/", gateway)
-	s.gateway = &http.Server{
-		Addr:    s.config.Addr(),
-		Handler: s.handler(s.grpc, mux),
-	}
-
-	return
-}
-
-func (s *Server) handler(grpc *grpc.Server, gateway http.Handler) http.Handler {
-	return h2c.NewHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.ProtoMajor == 2 && strings.Contains(r.Header.Get("Content-Type"), "application/grpc") {
-			grpc.ServeHTTP(w, r)
-		} else {
-			gateway.ServeHTTP(w, r)
-		}
-	}), new(http2.Server))
 }
