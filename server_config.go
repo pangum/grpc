@@ -8,7 +8,7 @@ type server struct {
 	// 绑定监听端口
 	Port int `default:"9001" json:"port" yaml:"port" xml:"port" toml:"port" validate:"required,min=1,max=65535"`
 	// 网关配置
-	Gateway *gateway `json:"gatewayEnabled" yaml:"gatewayEnabled" xml:"gatewayEnabled" toml:"gatewayEnabled"`
+	Gateway *gateway `json:"gateway" yaml:"gateway" xml:"gateway" toml:"gateway"`
 }
 
 func (s *server) Addr() string {
