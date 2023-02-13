@@ -3,6 +3,13 @@ grpc:
     port: 9001
     gateway:
       enabled: true
+      header:
+        removes:
+          - prefix: xx
+            suffix: xx
+        ins:
+          - prefix: xx
+            suffix: xx
       json:
         multiline: false
         indent: ""

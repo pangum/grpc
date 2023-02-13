@@ -24,6 +24,7 @@ func (s *Server) setupGateway(register register) (err error) {
 
 	gatewayOptions := s.config.Gateway.options()
 	gatewayOptions = append(gatewayOptions, runtime.WithForwardResponseOption(s.response))
+	gatewayOptions = append(gatewayOptions, runtime.WithIncomingHeaderMatcher(s.in))
 	if nil != s.config.Gateway.Unescape {
 		gatewayOptions = append(gatewayOptions, runtime.WithUnescapingMode(s.config.Gateway.Unescape.Mode))
 	}
@@ -93,24 +94,24 @@ func (s *Server) header(ctx context.Context, writer http.ResponseWriter, _ proto
 	for key, value := range header {
 		newKey := strings.ToLower(key)
 		removal := false
-
-		prefix := strings.ToLower(s.config.Gateway.Removal.Header.Prefix)
-		if strings.HasPrefix(newKey, prefix) {
-			newKey = strings.TrimPrefix(newKey, prefix)
-			removal = true
-		}
-
-		suffix := s.config.Gateway.Removal.Header.Suffix
-		if "" != suffix && strings.HasSuffix(newKey, suffix) {
-			newKey = strings.TrimSuffix(newKey, suffix)
-			removal = true
-		}
+		newKey, removal = s.config.Gateway.Header.testRemove(newKey)
 
 		if removal {
 			writer.Header().Set(newKey, value[0])
 			header.Delete(key)
 			writer.Header().Del(fmt.Sprintf(grpcMeatadataFormatter, key))
 		}
+	}
+
+	return
+}
+
+func (s *Server) in(key string) (new string, match bool) {
+	if newKey, test := s.config.Gateway.Header.testIns(key); test {
+		new = newKey
+		match = true
+	} else {
+		new, match = runtime.DefaultHeaderMatcher(key)
 	}
 
 	return

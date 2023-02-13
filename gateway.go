@@ -11,8 +11,8 @@ type gateway struct {
 	Enabled *bool `default:"true" json:"enabled" yaml:"enabled" xml:"enabled" toml:"enabled"`
 	// 序列化
 	Json json `json:"json" yaml:"json" xml:"json" toml:"json"`
-	// 删除
-	Removal removal `json:"removal" yaml:"removal" xml:"removal" toml:"removal"`
+	// 头
+	Header header `json:"header" yaml:"header" xml:"header" toml:"header"`
 	// 模式
 	Unescape *unescape `json:"unescape" yaml:"unescape" xml:"unescape" toml:"unescape"`
 }
