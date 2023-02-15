@@ -10,6 +10,11 @@ grpc:
         ins:
           - prefix: xx
             suffix: xx
+            contains: xx
+        outs:
+          - prefix: xx
+            suffix: xx
+            contains: xx
       json:
         multiline: false
         indent: ""

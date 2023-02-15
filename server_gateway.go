@@ -25,6 +25,7 @@ func (s *Server) setupGateway(register register) (err error) {
 	gatewayOptions := s.config.Gateway.options()
 	gatewayOptions = append(gatewayOptions, runtime.WithForwardResponseOption(s.response))
 	gatewayOptions = append(gatewayOptions, runtime.WithIncomingHeaderMatcher(s.in))
+	gatewayOptions = append(gatewayOptions, runtime.WithOutgoingHeaderMatcher(s.out))
 	if nil != s.config.Gateway.Unescape {
 		gatewayOptions = append(gatewayOptions, runtime.WithUnescapingMode(s.config.Gateway.Unescape.Mode))
 	}
@@ -108,6 +109,17 @@ func (s *Server) header(ctx context.Context, writer http.ResponseWriter, _ proto
 
 func (s *Server) in(key string) (new string, match bool) {
 	if newKey, test := s.config.Gateway.Header.testIns(key); test {
+		new = newKey
+		match = true
+	} else {
+		new, match = runtime.DefaultHeaderMatcher(key)
+	}
+
+	return
+}
+
+func (s *Server) out(key string) (new string, match bool) {
+	if newKey, test := s.config.Gateway.Header.testOuts(key); test {
 		new = newKey
 		match = true
 	} else {
