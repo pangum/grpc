@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/goexl/gox"
 	"github.com/goexl/gox/field"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"golang.org/x/net/http2"
@@ -66,36 +67,9 @@ func (s *Server) response(ctx context.Context, writer http.ResponseWriter, msg p
 }
 
 func (s *Server) status(ctx context.Context, writer http.ResponseWriter, _ proto.Message) (err error) {
-	var header metadata.MD
-	if md, ok := runtime.ServerMetadataFromContext(ctx); ok && 0 != len(md.HeaderMD.Get(httpStatusHeader)) {
-		err = s.setStatus(writer, md)
-	} else {
-
-	}
-
-	status := header.Get(httpStatusHeader)
-	if 0 == len(status) {
-		s.logger.Warn("状态码被错误设置", field.New("value", status))
-	} else if code, ae := strconv.Atoi(status[0]); nil != ae {
-		err = ae
-		s.logger.Warn("状态码被错误设置", field.New("value", status[0]))
-	} else {
-		header.Delete(httpStatusHeader)
-		writer.Header().Del(grpcStatusHeader)
-		writer.WriteHeader(code)
-	}
-
-	return
-}
-
-func (s *Server) setStatus(writer http.ResponseWriter, header metadata.MD, status string) (err error) {
-	if code, ae := strconv.Atoi(status); nil != ae {
-		err = ae
-		s.logger.Warn("状态码被错误设置", field.New("value", status))
-	} else {
-		header.Delete(httpStatusHeader)
-		writer.Header().Del(grpcStatusHeader)
-		writer.WriteHeader(code)
+	if md, ok := runtime.ServerMetadataFromContext(ctx); ok {
+		status := md.HeaderMD.Get(httpStatusHeader)
+		err = gox.If(0 != len(status), s.setStatus(writer, md.HeaderMD, status[0]))
 	}
 
 	return
@@ -139,6 +113,19 @@ func (s *Server) out(key string) (new string, match bool) {
 		match = true
 	} else {
 		new, match = runtime.DefaultHeaderMatcher(key)
+	}
+
+	return
+}
+
+func (s *Server) setStatus(writer http.ResponseWriter, header metadata.MD, status string) (err error) {
+	if code, ae := strconv.Atoi(status); nil != ae {
+		err = ae
+		s.logger.Warn("状态码被错误设置", field.New("value", status))
+	} else {
+		header.Delete(httpStatusHeader)
+		writer.Header().Del(grpcStatusHeader)
+		writer.WriteHeader(code)
 	}
 
 	return

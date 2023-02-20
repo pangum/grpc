@@ -6,7 +6,7 @@ import (
 
 type remove struct {
 	// 前缀
-	Prefix string `default:"Http-" json:"prefix" yaml:"prefix" xml:"prefix" toml:"suffix"`
+	Prefix string `json:"prefix" yaml:"prefix" xml:"prefix" toml:"suffix"`
 	// 后缀
 	Suffix string `json:"suffix" yaml:"suffix" xml:"suffix" toml:"suffix"`
 }
@@ -14,7 +14,7 @@ type remove struct {
 func (r *remove) test(key string) (new string, match bool) {
 	key = strings.ToLower(key)
 	prefix := strings.ToLower(r.Prefix)
-	if strings.HasPrefix(key, prefix) {
+	if ""!=prefix && strings.HasPrefix(key, prefix) {
 		new = strings.TrimPrefix(key, prefix)
 		match = true
 	}
