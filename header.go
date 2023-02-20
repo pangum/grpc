@@ -4,7 +4,8 @@ type header struct {
 	// 删除列表
 	Removes []remove `json:"removes" yaml:"removes" xml:"removes" toml:"removes"`
 	// 输入头匹配列表
-	Ins []matcher `default:"[{'prefix': 'X-Forwarded'}]" json:"ins" yaml:"ins" xml:"ins" toml:"ins"`
+	// nolint: lll
+	Ins []matcher `default:"[{'prefix': 'X-Forwarded'}, {'equal': 'Host'}, {'equal': 'Content-Type'}]" json:"ins" yaml:"ins" xml:"ins" toml:"ins"`
 	// 输出头匹配列表
 	Outs []matcher `xml:"outs" yaml:"outs" xml:"outs" toml:"outs"`
 }

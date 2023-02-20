@@ -5,6 +5,8 @@ import (
 )
 
 type matcher struct {
+	// 等于
+	Equal string `json:"equal" yaml:"equal" xml:"equal" toml:"equal"`
 	// 前缀
 	Prefix string `json:"prefix" yaml:"prefix" xml:"prefix" toml:"suffix"`
 	// 后缀
@@ -15,20 +17,21 @@ type matcher struct {
 
 func (m *matcher) test(key string) (new string, match bool) {
 	key = strings.ToLower(key)
-	prefix := strings.ToLower(m.Prefix)
-	if strings.HasPrefix(key, prefix) {
+	new = key
+	if "" != m.Equal && strings.ToLower(m.Equal) == key {
+		match = true
+	}
+
+	if "" != m.Prefix && strings.HasPrefix(key, strings.ToLower(m.Prefix)) {
+		match = true
+	}
+
+	if "" != m.Suffix && strings.HasSuffix(key, strings.ToLower(m.Suffix)) {
 		new = key
 		match = true
 	}
 
-	suffix := strings.ToLower(m.Suffix)
-	if "" != suffix && strings.HasSuffix(key, suffix) {
-		new = key
-		match = true
-	}
-
-	contains := strings.ToLower(m.Contains)
-	if "" != suffix && strings.Contains(key, contains) {
+	if "" != m.Contains && strings.Contains(key, strings.ToLower(m.Contains)) {
 		new = key
 		match = true
 	}
