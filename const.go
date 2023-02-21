@@ -9,4 +9,5 @@ const (
 	grpcMetadataFormatter = "Grpc-Metadata-%s"
 	grpcGatewayUri        = "grpcgateway-uri"
 	grpcGatewayMethod     = "grpcgateway-method"
+	grpcGatewayProto      = "grpcgateway-proto"
 )

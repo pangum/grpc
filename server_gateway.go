@@ -135,6 +135,7 @@ func (s *Server) metadata(_ context.Context, req *http.Request) metadata.MD {
 	md := make(map[string]string)
 	md[grpcGatewayUri] = req.URL.RequestURI()
 	md[grpcGatewayMethod] = req.Method
+	md[grpcGatewayProto] = req.Proto
 
 	return metadata.New(md)
 }
