@@ -134,6 +134,7 @@ func (s *Server) out(key string) (new string, match bool) {
 func (s *Server) metadata(_ context.Context, req *http.Request) metadata.MD {
 	md := make(map[string]string)
 	md[grpcGatewayUri] = req.URL.RequestURI()
+	md[grpcGatewayMethod] = req.Method
 
 	return metadata.New(md)
 }
