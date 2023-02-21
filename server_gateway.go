@@ -39,8 +39,10 @@ func (s *Server) setupGateway(register register) (err error) {
 	mux := http.NewServeMux()
 	mux.Handle("/", gateway)
 	s.gateway = &http.Server{
-		Addr:    s.config.Addr(),
-		Handler: s.handler(s.grpc, mux),
+		Addr:              s.config.Addr(),
+		Handler:           s.handler(s.grpc, mux),
+		ReadTimeout:       s.config.Gateway.Timeout.Read,
+		ReadHeaderTimeout: s.config.Gateway.Timeout.Header,
 	}
 
 	return
@@ -138,17 +140,4 @@ func (s *Server) metadata(_ context.Context, req *http.Request) metadata.MD {
 	md[grpcGatewayProto] = req.Proto
 
 	return metadata.New(md)
-}
-
-func (s *Server) setStatus(writer http.ResponseWriter, header metadata.MD, status []string) (err error) {
-	if code, ae := strconv.Atoi(status[0]); nil != ae {
-		err = ae
-		s.logger.Warn("状态码被错误设置", field.New("value", status))
-	} else {
-		header.Delete(httpStatusHeader)
-		writer.Header().Del(grpcStatusHeader)
-		writer.WriteHeader(code)
-	}
-
-	return
 }

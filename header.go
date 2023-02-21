@@ -13,7 +13,7 @@ type header struct {
 	// nolint: lll
 	Ins []matcher `json:"ins" yaml:"ins" xml:"ins" toml:"ins"`
 	// 输出头匹配列表
-	Outs []matcher `xml:"outs" yaml:"outs" xml:"outs" toml:"outs"`
+	Outs []matcher `json:"outs" yaml:"outs" xml:"outs" toml:"outs"`
 
 	DefaultRemoves []remove  `default:"[{'prefix': 'http-'}]"`
 	DefaultIns     []matcher `default:"[{'prefix': 'x-forwarded'}]"`
