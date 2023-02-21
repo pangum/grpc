@@ -4,6 +4,7 @@ import (
 	"github.com/goexl/gox"
 	"github.com/pangum/pangu"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/keepalive"
 )
 
@@ -23,7 +24,7 @@ func newClient(config *pangu.Config) (client *Client, err error) {
 	// 组织配置项
 	_config := _panguConfig.Grpc
 	_options := make([]grpc.DialOption, 0, 8)
-	_options = append(_options, grpc.WithInsecure())
+	_options = append(_options, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	_options = append(_options, grpc.WithInitialWindowSize(int32(_config.Options.Size.Window.Initial)))
 	_options = append(_options, grpc.WithInitialConnWindowSize(int32(_config.Options.Size.Window.Connection)))
 	// nolint:lll
