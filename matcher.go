@@ -18,20 +18,20 @@ type matcher struct {
 func (m *matcher) test(key string) (new string, match bool) {
 	key = strings.ToLower(key)
 	new = key
-	if "" != m.Equal && strings.ToLower(m.Equal) == key {
+	if "" != m.Equal && m.Equal == key {
 		match = true
 	}
 
-	if "" != m.Prefix && strings.HasPrefix(key, strings.ToLower(m.Prefix)) {
+	if "" != m.Prefix && strings.HasPrefix(key, m.Prefix) {
 		match = true
 	}
 
-	if "" != m.Suffix && strings.HasSuffix(key, strings.ToLower(m.Suffix)) {
+	if "" != m.Suffix && strings.HasSuffix(key, m.Suffix) {
 		new = key
 		match = true
 	}
 
-	if "" != m.Contains && strings.Contains(key, strings.ToLower(m.Contains)) {
+	if "" != m.Contains && strings.Contains(key, m.Contains) {
 		new = key
 		match = true
 	}

@@ -13,13 +13,13 @@ type remove struct {
 
 func (r *remove) test(key string) (new string, match bool) {
 	key = strings.ToLower(key)
-	prefix := strings.ToLower(r.Prefix)
-	if ""!=prefix && strings.HasPrefix(key, prefix) {
+	prefix := r.Prefix
+	if "" != prefix && strings.HasPrefix(key, r.Prefix) {
 		new = strings.TrimPrefix(key, prefix)
 		match = true
 	}
 
-	suffix := strings.ToLower(r.Suffix)
+	suffix := r.Suffix
 	if "" != suffix && strings.HasSuffix(key, suffix) {
 		new = strings.TrimSuffix(key, suffix)
 		match = true

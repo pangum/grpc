@@ -7,7 +7,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/goexl/gox"
 	"github.com/goexl/gox/field"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"golang.org/x/net/http2"
@@ -57,9 +56,10 @@ func (s *Server) handler(grpc *grpc.Server, gateway http.Handler) http.Handler {
 }
 
 func (s *Server) response(ctx context.Context, writer http.ResponseWriter, msg proto.Message) (err error) {
-	if se := s.status(ctx, writer, msg); nil != se {
+	// 注意，这儿的顺序不能乱，必须先写入头再写入状态码
+	if se := s.header(ctx, writer, msg); nil != se {
 		err = se
-	} else if he := s.header(ctx, writer, msg); nil != he {
+	} else if he := s.status(ctx, writer, msg); nil != he {
 		err = he
 	}
 
@@ -67,9 +67,17 @@ func (s *Server) response(ctx context.Context, writer http.ResponseWriter, msg p
 }
 
 func (s *Server) status(ctx context.Context, writer http.ResponseWriter, _ proto.Message) (err error) {
-	if md, ok := runtime.ServerMetadataFromContext(ctx); ok {
-		status := md.HeaderMD.Get(httpStatusHeader)
-		err = gox.If(0 != len(status), s.setStatus(writer, md.HeaderMD, status[0]))
+	if md, ok := runtime.ServerMetadataFromContext(ctx); !ok {
+		// 上下文无法转换
+	} else if status := md.HeaderMD.Get(httpStatusHeader); 0 == len(status) {
+		// 没有设置状态
+	} else if code, ae := strconv.Atoi(status[0]); nil != ae {
+		err = ae
+		s.logger.Warn("状态码被错误设置", field.New("value", status))
+	} else {
+		md.HeaderMD.Delete(httpStatusHeader)
+		writer.Header().Del(grpcStatusHeader)
+		writer.WriteHeader(code)
 	}
 
 	return
@@ -82,14 +90,18 @@ func (s *Server) header(ctx context.Context, writer http.ResponseWriter, _ proto
 	}
 
 	for key, value := range header {
+		if httpStatusHeader == key { // 不处理设置状态码的逻辑，由状态码设置逻辑特殊处理
+			continue
+		}
+
 		newKey := strings.ToLower(key)
 		removal := false
 		newKey, removal = s.config.Gateway.Header.testRemove(newKey)
 
 		if removal {
-			writer.Header().Set(newKey, value[0])
+			writer.Header().Set(newKey, strings.Join(value, space))
 			header.Delete(key)
-			writer.Header().Del(fmt.Sprintf(grpcMeatadataFormatter, key))
+			writer.Header().Del(fmt.Sprintf(grpcMetadataFormatter, key))
 		}
 	}
 
@@ -118,8 +130,8 @@ func (s *Server) out(key string) (new string, match bool) {
 	return
 }
 
-func (s *Server) setStatus(writer http.ResponseWriter, header metadata.MD, status string) (err error) {
-	if code, ae := strconv.Atoi(status); nil != ae {
+func (s *Server) setStatus(writer http.ResponseWriter, header metadata.MD, status []string) (err error) {
+	if code, ae := strconv.Atoi(status[0]); nil != ae {
 		err = ae
 		s.logger.Warn("状态码被错误设置", field.New("value", status))
 	} else {
