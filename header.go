@@ -16,7 +16,7 @@ type header struct {
 	Outs []matcher `xml:"outs" yaml:"outs" xml:"outs" toml:"outs"`
 
 	DefaultRemoves []remove  `default:"[{'prefix': 'http-'}]"`
-	DefaultIns     []matcher `default:"[{'prefix': 'x-forwarded'}, {'equal': 'host'}, {'equal': 'content-type'}]"`
+	DefaultIns     []matcher `default:"[{'prefix': 'x-forwarded'}]"`
 }
 
 func (h *header) testRemove(key string) (new string, match bool) {

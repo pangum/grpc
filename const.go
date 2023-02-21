@@ -7,4 +7,5 @@ const (
 
 	grpcStatusHeader      = "Grpc-Metadata-X-Http-Code"
 	grpcMetadataFormatter = "Grpc-Metadata-%s"
+	grpcGatewayUri        = "grpcgateway-uri"
 )

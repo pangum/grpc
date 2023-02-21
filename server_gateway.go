@@ -26,6 +26,7 @@ func (s *Server) setupGateway(register register) (err error) {
 	gatewayOptions = append(gatewayOptions, runtime.WithForwardResponseOption(s.response))
 	gatewayOptions = append(gatewayOptions, runtime.WithIncomingHeaderMatcher(s.in))
 	gatewayOptions = append(gatewayOptions, runtime.WithOutgoingHeaderMatcher(s.out))
+	gatewayOptions = append(gatewayOptions, runtime.WithMetadata(s.metadata))
 	if nil != s.config.Gateway.Unescape {
 		gatewayOptions = append(gatewayOptions, runtime.WithUnescapingMode(s.config.Gateway.Unescape.Mode))
 	}
@@ -128,6 +129,13 @@ func (s *Server) out(key string) (new string, match bool) {
 	}
 
 	return
+}
+
+func (s *Server) metadata(_ context.Context, req *http.Request) metadata.MD {
+	md := make(map[string]string)
+	md[grpcGatewayUri] = req.URL.RequestURI()
+
+	return metadata.New(md)
 }
 
 func (s *Server) setStatus(writer http.ResponseWriter, header metadata.MD, status []string) (err error) {
