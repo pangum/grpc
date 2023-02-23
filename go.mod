@@ -7,12 +7,12 @@ require (
 	github.com/pangum/logging v0.1.9
 	github.com/pangum/pangu v0.3.1
 	golang.org/x/net v0.7.0
-	google.golang.org/genproto v0.0.0-20230209215440-0dfe4f8abfcc // indirect
+	google.golang.org/genproto v0.0.0-20230221151758-ace64dc21148 // indirect
 	google.golang.org/grpc v1.53.0
 	google.golang.org/protobuf v1.28.1
 )
 
-require github.com/grpc-ecosystem/grpc-gateway/v2 v2.15.0
+require github.com/grpc-ecosystem/grpc-gateway/v2 v2.15.1
 
 require (
 	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
@@ -28,6 +28,7 @@ require (
 	github.com/goexl/mengpo v0.2.4 // indirect
 	github.com/goexl/simaqian v0.2.3 // indirect
 	github.com/goexl/xiren v0.0.5 // indirect
+	github.com/golang/glog v1.0.0 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/kr/text v0.2.0 // indirect
