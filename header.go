@@ -20,7 +20,12 @@ type header struct {
 }
 
 func (h *header) testRemove(key string) (new string, match bool) {
-	for _, remove := range gox.Ifx(*h.Default, append(h.DefaultRemoves, h.Removes...), h.Removes) {
+	removes := gox.Ifx(*h.Default, func() []remove {
+		return append(h.DefaultRemoves, h.Removes...)
+	}, func() []remove {
+		return h.Removes
+	})
+	for _, remove := range removes {
 		if new, match = remove.test(key); match {
 			break
 		}
@@ -30,7 +35,11 @@ func (h *header) testRemove(key string) (new string, match bool) {
 }
 
 func (h *header) testIns(key string) (new string, match bool) {
-	return h.match(gox.Ifx(*h.Default, append(h.DefaultIns, h.Ins...), h.Ins), key)
+	return h.match(gox.Ifx(*h.Default, func() []matcher {
+		return append(h.DefaultIns, h.Ins...)
+	}, func() []matcher {
+		return h.Ins
+	}), key)
 }
 
 func (h *header) testOuts(key string) (new string, match bool) {
