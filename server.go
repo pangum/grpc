@@ -15,11 +15,13 @@ import (
 
 // Server gRPC服务器封装
 type Server struct {
-	grpc    *grpc.Server
-	gateway *http.Server
-	config  server
+	rpc    *grpc.Server
+	http   *http.Server
+	mux    *http.ServeMux
+	config server
 
-	logger *logging.Logger
+	serveHttp bool
+	logger    *logging.Logger
 }
 
 func newServer(config *pangu.Config, logger *logging.Logger) (server *Server, err error) {
@@ -45,7 +47,8 @@ func newServer(config *pangu.Config, logger *logging.Logger) (server *Server, er
 	}))
 
 	server = &Server{
-		grpc:   grpc.NewServer(_options...),
+		rpc:    grpc.NewServer(_options...),
+		mux:    http.NewServeMux(),
 		config: _config.Server,
 
 		logger: logger,
@@ -66,16 +69,19 @@ func (s *Server) Serve(register register, opts ...serveOption) (err error) {
 	}
 
 	// 注册服务
-	if err = s.setupGrpc(register); nil != err {
+	if err = s.grpc(register); nil != err {
 		return
 	}
-	if err = s.setupGateway(register); nil != err {
+	if err = s.gateway(register); nil != err {
+		return
+	}
+	if err = s.metric(register); nil != err {
 		return
 	}
 
 	// 处理选项
 	if _options.Reflection {
-		reflection.Register(s.grpc)
+		reflection.Register(s.rpc)
 	}
 
 	s.logger.Info("启动gRPC服务器", field.New("port", s.config.Port))
@@ -86,25 +92,31 @@ func (s *Server) Serve(register register, opts ...serveOption) (err error) {
 }
 
 func (s *Server) Stop() {
-	if s.config.gatewayEnabled() {
-		_ = s.gateway.Shutdown(context.Background())
+	if s.serveHttp {
+		_ = s.http.Shutdown(context.Background())
 	} else {
-		s.grpc.GracefulStop()
+		s.rpc.GracefulStop()
 	}
 }
 
 func (s *Server) startup(listener net.Listener) (err error) {
-	if s.config.gatewayEnabled() {
-		err = s.gateway.Serve(listener)
+	if s.serveHttp {
+		s.http = &http.Server{
+			Addr:              s.config.Addr(),
+			Handler:           s.handler(s.rpc, s.mux),
+			ReadTimeout:       s.config.Timeout.Read,
+			ReadHeaderTimeout: s.config.Timeout.Header,
+		}
+		err = s.http.Serve(listener)
 	} else {
-		err = s.grpc.Serve(listener)
+		err = s.rpc.Serve(listener)
 	}
 
 	return
 }
 
-func (s *Server) setupGrpc(register register) (err error) {
-	register.Grpc(s.grpc)
+func (s *Server) grpc(register register) (err error) {
+	register.Grpc(s.rpc)
 
 	return
 }

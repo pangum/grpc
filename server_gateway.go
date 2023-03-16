@@ -9,15 +9,13 @@ import (
 
 	"github.com/goexl/gox/field"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
-	"golang.org/x/net/http2"
-	"golang.org/x/net/http2/h2c"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/proto"
 )
 
-func (s *Server) setupGateway(register register) (err error) {
+func (s *Server) gateway(register register) (err error) {
 	if !s.config.gatewayEnabled() {
 		return
 	}
@@ -32,30 +30,14 @@ func (s *Server) setupGateway(register register) (err error) {
 	}
 	gateway := runtime.NewServeMux(gatewayOptions...)
 	grpcOptions := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
-	if err = register.Gateway(gateway, s.config.Addr(), grpcOptions...); nil != err {
-		return
-	}
-
-	mux := http.NewServeMux()
-	mux.Handle("/", gateway)
-	s.gateway = &http.Server{
-		Addr:              s.config.Addr(),
-		Handler:           s.handler(s.grpc, mux),
-		ReadTimeout:       s.config.Gateway.Timeout.Read,
-		ReadHeaderTimeout: s.config.Gateway.Timeout.Header,
+	if ge := register.Gateway(gateway, s.config.Addr(), grpcOptions...); nil != ge {
+		err = ge
+	} else {
+		s.mux.Handle("/", gateway)
+		s.serveHttp = true
 	}
 
 	return
-}
-
-func (s *Server) handler(grpc *grpc.Server, gateway http.Handler) http.Handler {
-	return h2c.NewHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.ProtoMajor == 2 && strings.Contains(r.Header.Get("Content-Type"), "application/grpc") {
-			grpc.ServeHTTP(w, r)
-		} else {
-			gateway.ServeHTTP(w, r)
-		}
-	}), new(http2.Server))
 }
 
 func (s *Server) response(ctx context.Context, writer http.ResponseWriter, msg proto.Message) (err error) {

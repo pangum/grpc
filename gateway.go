@@ -15,8 +15,6 @@ type gateway struct {
 	Header header `json:"header" yaml:"header" xml:"header" toml:"header"`
 	// 模式
 	Unescape *unescape `json:"unescape" yaml:"unescape" xml:"unescape" toml:"unescape"`
-	// 超时
-	Timeout timeout `json:"timeout" yaml:"timeout" xml:"timeout" toml:"timeout"`
 }
 
 func (g *gateway) options() (options []runtime.ServeMuxOption) {
