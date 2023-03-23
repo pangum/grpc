@@ -16,7 +16,7 @@ type Client struct {
 }
 
 func newClient(config *pangu.Config) (client *Client, err error) {
-	_panguConfig := new(panguConfig)
+	_panguConfig := new(wrapper)
 	if err = config.Load(_panguConfig); nil != err {
 		return
 	}

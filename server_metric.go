@@ -9,7 +9,6 @@ func (s *Server) metric(register register) (err error) {
 		err = me
 	} else {
 		s.mux.Handle(s.config.Metric.Pattern, handler)
-		s.serveHttp = true
 	}
 
 	return

@@ -19,37 +19,35 @@ type Server struct {
 	http   *http.Server
 	mux    *http.ServeMux
 	config server
-
-	serveHttp bool
-	logger    *logging.Logger
+	logger logging.Logger
 }
 
-func newServer(config *pangu.Config, logger *logging.Logger) (server *Server, err error) {
-	_panguConfig := new(panguConfig)
-	if err = config.Load(_panguConfig); nil != err {
+func newServer(config *pangu.Config, logger logging.Logger) (server *Server, err error) {
+	wrap := new(wrapper)
+	if err = config.Load(wrap); nil != err {
 		return
 	}
 
 	// 组织配置项
-	_config := _panguConfig.Grpc
+	conf := wrap.Grpc
 	_options := make([]grpc.ServerOption, 0, 8)
-	_options = append(_options, grpc.InitialWindowSize(int32(_config.Options.Size.Window.Initial)))
-	_options = append(_options, grpc.InitialConnWindowSize(int32(_config.Options.Size.Window.Connection)))
-	_options = append(_options, grpc.MaxSendMsgSize(int(_config.Options.Size.Msg.Send)))
-	_options = append(_options, grpc.MaxRecvMsgSize(int(_config.Options.Size.Msg.Receive)))
+	_options = append(_options, grpc.InitialWindowSize(int32(conf.Options.Size.Window.Initial)))
+	_options = append(_options, grpc.InitialConnWindowSize(int32(conf.Options.Size.Window.Connection)))
+	_options = append(_options, grpc.MaxSendMsgSize(int(conf.Options.Size.Msg.Send)))
+	_options = append(_options, grpc.MaxRecvMsgSize(int(conf.Options.Size.Msg.Receive)))
 	_options = append(_options, grpc.KeepaliveEnforcementPolicy(keepalive.EnforcementPolicy{
-		PermitWithoutStream: _config.Options.Keepalive.Policy.Permit,
+		PermitWithoutStream: conf.Options.Keepalive.Policy.Permit,
 	}))
 	_options = append(_options, grpc.KeepaliveParams(keepalive.ServerParameters{
-		MaxConnectionIdle: _config.Options.Keepalive.Idle,
-		Time:              _config.Options.Keepalive.Time,
-		Timeout:           _config.Options.Keepalive.Timeout,
+		MaxConnectionIdle: conf.Options.Keepalive.Idle,
+		Time:              conf.Options.Keepalive.Time,
+		Timeout:           conf.Options.Keepalive.Timeout,
 	}))
 
 	server = &Server{
 		rpc:    grpc.NewServer(_options...),
 		mux:    http.NewServeMux(),
-		config: _config.Server,
+		config: conf.Server,
 
 		logger: logger,
 	}
@@ -84,7 +82,6 @@ func (s *Server) Serve(register register, opts ...serveOption) (err error) {
 		reflection.Register(s.rpc)
 	}
 
-	s.logger.Info("启动gRPC服务器", field.New("port", s.config.Port))
 	// 启动服务
 	err = s.startup(listener)
 
@@ -92,25 +89,19 @@ func (s *Server) Serve(register register, opts ...serveOption) (err error) {
 }
 
 func (s *Server) Stop() {
-	if s.serveHttp {
-		_ = s.http.Shutdown(context.Background())
-	} else {
-		s.rpc.GracefulStop()
-	}
+	s.rpc.GracefulStop()
+	_ = s.http.Shutdown(context.Background())
 }
 
 func (s *Server) startup(listener net.Listener) (err error) {
-	if s.serveHttp {
-		s.http = &http.Server{
-			Addr:              s.config.Addr(),
-			Handler:           s.handler(s.rpc, s.mux),
-			ReadTimeout:       s.config.Timeout.Read,
-			ReadHeaderTimeout: s.config.Timeout.Header,
-		}
-		err = s.http.Serve(listener)
-	} else {
-		err = s.rpc.Serve(listener)
-	}
+	s.http = new(http.Server)
+	s.http.Addr = s.config.Addr()
+	s.http.Handler = s.handler(s.rpc, s.mux)
+	s.http.ReadTimeout = s.config.Timeout.Read
+	s.http.ReadHeaderTimeout = s.config.Timeout.Header
+
+	s.logger.Info("启动gRPC服务器", field.New("port", s.config.Port))
+	err = s.http.Serve(listener)
 
 	return
 }

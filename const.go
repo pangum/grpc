@@ -3,7 +3,9 @@ package grpc
 const (
 	space = " "
 
-	httpStatusHeader = "http-code"
+	httpStatusHeader  = "http-code"
+	headerContentType = "Content-Type"
+	grpcHeaderValue   = "application/grpc"
 
 	grpcStatusHeader      = "Grpc-Metadata-X-Http-Code"
 	grpcMetadataFormatter = "Grpc-Metadata-%s"

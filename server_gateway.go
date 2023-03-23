@@ -34,7 +34,6 @@ func (s *Server) gateway(register register) (err error) {
 		err = ge
 	} else {
 		s.mux.Handle("/", gateway)
-		s.serveHttp = true
 	}
 
 	return
