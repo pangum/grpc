@@ -16,31 +16,29 @@ type Client struct {
 }
 
 func newClient(config *pangu.Config) (client *Client, err error) {
-	_panguConfig := new(wrapper)
-	if err = config.Load(_panguConfig); nil != err {
+	wrap := new(wrapper)
+	if err = config.Load(wrap); nil != err {
 		return
 	}
 
 	// 组织配置项
-	_config := _panguConfig.Grpc
-	_options := make([]grpc.DialOption, 0, 8)
-	_options = append(_options, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	_options = append(_options, grpc.WithInitialWindowSize(int32(_config.Options.Size.Window.Initial)))
-	_options = append(_options, grpc.WithInitialConnWindowSize(int32(_config.Options.Size.Window.Connection)))
-	// nolint:lll
-	_options = append(_options, grpc.WithDefaultCallOptions(grpc.MaxCallSendMsgSize(int(_config.Options.Size.Msg.Send))))
-	// nolint:lll
-	_options = append(_options, grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(int(_config.Options.Size.Msg.Receive))))
-	_options = append(_options, grpc.WithKeepaliveParams(keepalive.ClientParameters{
-		Time:                _config.Options.Keepalive.Time,
-		Timeout:             _config.Options.Keepalive.Timeout,
-		PermitWithoutStream: _config.Options.Keepalive.Policy.Permit,
+	conf := wrap.Grpc
+	opts := make([]grpc.DialOption, 0, 8)
+	opts = append(opts, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	opts = append(opts, grpc.WithInitialWindowSize(int32(conf.Options.Size.Window.Initial)))
+	opts = append(opts, grpc.WithInitialConnWindowSize(int32(conf.Options.Size.Window.Connection)))
+	opts = append(opts, grpc.WithDefaultCallOptions(grpc.MaxCallSendMsgSize(int(conf.Options.Size.Msg.Send))))
+	opts = append(opts, grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(int(conf.Options.Size.Msg.Receive))))
+	opts = append(opts, grpc.WithKeepaliveParams(keepalive.ClientParameters{
+		Time:                conf.Options.Keepalive.Time,
+		Timeout:             conf.Options.Keepalive.Timeout,
+		PermitWithoutStream: conf.Options.Keepalive.Policy.Permit,
 	}))
 
 	connections := make(map[string]*grpc.ClientConn)
-	for _, conf := range _config.Clients {
+	for _, conf := range conf.Clients {
 		var connection *grpc.ClientConn
-		if connection, err = grpc.Dial(conf.Addr, _options...); nil != err {
+		if connection, err = grpc.Dial(conf.Addr, opts...); nil != err {
 			return
 		}
 

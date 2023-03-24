@@ -30,22 +30,22 @@ func newServer(config *pangu.Config, logger logging.Logger) (server *Server, err
 
 	// 组织配置项
 	conf := wrap.Grpc
-	_options := make([]grpc.ServerOption, 0, 8)
-	_options = append(_options, grpc.InitialWindowSize(int32(conf.Options.Size.Window.Initial)))
-	_options = append(_options, grpc.InitialConnWindowSize(int32(conf.Options.Size.Window.Connection)))
-	_options = append(_options, grpc.MaxSendMsgSize(int(conf.Options.Size.Msg.Send)))
-	_options = append(_options, grpc.MaxRecvMsgSize(int(conf.Options.Size.Msg.Receive)))
-	_options = append(_options, grpc.KeepaliveEnforcementPolicy(keepalive.EnforcementPolicy{
+	opts := make([]grpc.ServerOption, 0, 8)
+	opts = append(opts, grpc.InitialWindowSize(int32(conf.Options.Size.Window.Initial)))
+	opts = append(opts, grpc.InitialConnWindowSize(int32(conf.Options.Size.Window.Connection)))
+	opts = append(opts, grpc.MaxSendMsgSize(int(conf.Options.Size.Msg.Send)))
+	opts = append(opts, grpc.MaxRecvMsgSize(int(conf.Options.Size.Msg.Receive)))
+	opts = append(opts, grpc.KeepaliveEnforcementPolicy(keepalive.EnforcementPolicy{
 		PermitWithoutStream: conf.Options.Keepalive.Policy.Permit,
 	}))
-	_options = append(_options, grpc.KeepaliveParams(keepalive.ServerParameters{
+	opts = append(opts, grpc.KeepaliveParams(keepalive.ServerParameters{
 		MaxConnectionIdle: conf.Options.Keepalive.Idle,
 		Time:              conf.Options.Keepalive.Time,
 		Timeout:           conf.Options.Keepalive.Timeout,
 	}))
 
 	server = &Server{
-		rpc:    grpc.NewServer(_options...),
+		rpc:    grpc.NewServer(opts...),
 		mux:    http.NewServeMux(),
 		config: conf.Server,
 
