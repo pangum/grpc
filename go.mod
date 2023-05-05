@@ -8,7 +8,7 @@ require (
 	github.com/pangum/pangu v0.3.1
 	golang.org/x/net v0.9.0
 	google.golang.org/genproto v0.0.0-20230322174352-cde4c949918d // indirect
-	google.golang.org/grpc v1.54.0
+	google.golang.org/grpc v1.55.0
 	google.golang.org/protobuf v1.30.0
 )
 
