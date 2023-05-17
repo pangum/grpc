@@ -6,6 +6,7 @@ const (
 	httpStatusHeader  = "http-code"
 	headerContentType = "Content-Type"
 	grpcHeaderValue   = "application/grpc"
+	rawHeaderValue    = "application/raw"
 
 	grpcStatusHeader      = "Grpc-Metadata-X-Http-Code"
 	grpcMetadataFormatter = "Grpc-Metadata-%s"

@@ -13,6 +13,8 @@ type gateway struct {
 	Json json `json:"json" yaml:"json" xml:"json" toml:"json"`
 	// 头
 	Header header `json:"header" yaml:"header" xml:"header" toml:"header"`
+	// 消息体
+	Body body `json:"body" yaml:"body" xml:"body" toml:"body"`
 	// 模式
 	Unescape *unescape `json:"unescape" yaml:"unescape" xml:"unescape" toml:"unescape"`
 }

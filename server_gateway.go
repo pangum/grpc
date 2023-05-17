@@ -20,11 +20,17 @@ func (s *Server) gateway(register register) (err error) {
 		return
 	}
 
+	pb := new(runtime.JSONPb)
 	gatewayOptions := s.config.Gateway.options()
 	gatewayOptions = append(gatewayOptions, runtime.WithForwardResponseOption(s.response))
 	gatewayOptions = append(gatewayOptions, runtime.WithIncomingHeaderMatcher(s.in))
 	gatewayOptions = append(gatewayOptions, runtime.WithOutgoingHeaderMatcher(s.out))
 	gatewayOptions = append(gatewayOptions, runtime.WithMetadata(s.metadata))
+	gatewayOptions = append(gatewayOptions, runtime.WithMetadata(s.metadata))
+	// 确保内置解码器被正确的设置，防止其它请求无法解出数据
+	gatewayOptions = append(gatewayOptions, runtime.WithMarshalerOption(runtime.MIMEWildcard, pb))
+	// 使用特定的解码器来处理原始数据
+	gatewayOptions = append(gatewayOptions, runtime.WithMarshalerOption(rawHeaderValue, newRawDecoder(pb)))
 	if nil != s.config.Gateway.Unescape {
 		gatewayOptions = append(gatewayOptions, runtime.WithUnescapingMode(s.config.Gateway.Unescape.Mode))
 	}

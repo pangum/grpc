@@ -9,11 +9,18 @@ import (
 )
 
 func (s *Server) handler(grpc *grpc.Server, gateway http.Handler) http.Handler {
-	return h2c.NewHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.ProtoMajor >= 2 && grpcHeaderValue == r.Header.Get(headerContentType) {
-			grpc.ServeHTTP(w, r)
+	return h2c.NewHandler(http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+		if request.ProtoMajor >= 2 && grpcHeaderValue == request.Header.Get(headerContentType) {
+			grpc.ServeHTTP(writer, request)
 		} else {
-			gateway.ServeHTTP(w, r)
+			s.addRawType(request)
+			gateway.ServeHTTP(writer, request)
 		}
 	}), new(http2.Server))
+}
+
+func (s *Server) addRawType(request *http.Request) {
+	if s.config.Gateway.Body.check(request.URL.Path) {
+		request.Header.Set(headerContentType, rawHeaderValue)
+	}
 }
