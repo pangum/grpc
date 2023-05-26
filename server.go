@@ -22,7 +22,7 @@ type Server struct {
 	logger logging.Logger
 }
 
-func newServer(config *pangu.Config, logger logging.Logger) (server *Server, err error) {
+func newServer(config *pangu.Config, logger logging.Logger) (server *Server, mux *http.ServeMux, err error) {
 	wrap := new(wrapper)
 	if err = config.Load(wrap); nil != err {
 		return
@@ -44,9 +44,10 @@ func newServer(config *pangu.Config, logger logging.Logger) (server *Server, err
 		Timeout:           conf.Options.Keepalive.Timeout,
 	}))
 
+	mux = http.NewServeMux()
 	server = &Server{
 		rpc:    grpc.NewServer(opts...),
-		mux:    http.NewServeMux(),
+		mux:    mux,
 		config: conf.Server,
 
 		logger: logger,
@@ -61,29 +62,19 @@ func (s *Server) Serve(register register, opts ...serveOption) (err error) {
 		opt.apply(_options)
 	}
 
-	var listener net.Listener
-	if listener, err = net.Listen("tcp", s.config.Addr()); nil != err {
-		return
-	}
-
-	// 注册服务
-	if err = s.grpc(register); nil != err {
-		return
-	}
-	if err = s.gateway(register); nil != err {
-		return
-	}
-	if err = s.metric(register); nil != err {
-		return
-	}
-
-	// 处理选项
-	if _options.Reflection {
+	if _options.Reflection { // 反射，在gRPC接口调试时，可以反射出方法和参数
 		reflection.Register(s.rpc)
 	}
 
-	// 启动服务
-	err = s.startup(listener)
+	if listener, le := net.Listen(tcp, s.config.Addr()); nil != le {
+		err = le
+	} else if re := s.grpc(register); nil != re {
+		err = re
+	} else if gwe := s.gateway(register); nil != gwe {
+		err = gwe
+	} else {
+		err = s.startup(listener)
+	}
 
 	return
 }

@@ -2,6 +2,7 @@ package grpc
 
 const (
 	space = " "
+	tcp   = "tcp"
 
 	httpStatusHeader  = "http-code"
 	headerContentType = "Content-Type"

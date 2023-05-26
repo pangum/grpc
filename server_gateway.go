@@ -34,12 +34,12 @@ func (s *Server) gateway(register register) (err error) {
 	if nil != s.config.Gateway.Unescape {
 		gatewayOptions = append(gatewayOptions, runtime.WithUnescapingMode(s.config.Gateway.Unescape.Mode))
 	}
-	gateway := runtime.NewServeMux(gatewayOptions...)
+	_gateway := runtime.NewServeMux(gatewayOptions...)
 	grpcOptions := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
-	if ge := register.Gateway(gateway, s.config.Addr(), grpcOptions...); nil != ge {
+	if ge := register.Gateway(_gateway, s.config.Addr(), grpcOptions...); nil != ge {
 		err = ge
 	} else {
-		s.mux.Handle("/", gateway)
+		s.mux.Handle("/", _gateway)
 	}
 
 	return
