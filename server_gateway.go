@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/goexl/gox"
 	"github.com/goexl/gox/field"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
@@ -38,8 +39,11 @@ func (s *Server) gateway(register register) (err error) {
 	grpcOptions := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
 	if ge := register.Gateway(_gateway, s.config.Addr(), grpcOptions...); nil != ge {
 		err = ge
+	} else if "" == s.config.Gateway.Path {
+		s.mux.Handle(slash, _gateway)
 	} else {
-		s.mux.Handle("/", _gateway)
+		path := s.config.Gateway.Path
+		s.mux.Handle(gox.StringBuilder(path, slash).String(), http.StripPrefix(path, _gateway))
 	}
 
 	return

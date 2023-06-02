@@ -9,6 +9,8 @@ import (
 type gateway struct {
 	// 是否开启
 	Enabled *bool `default:"true" json:"enabled" yaml:"enabled" xml:"enabled" toml:"enabled"`
+	// 路径
+	Path string `json:"path" yaml:"path" xml:"path" toml:"path" validate:"omitempty,startswith=/,endsnotwith=/"`
 	// 序列化
 	Json json `json:"json" yaml:"json" xml:"json" toml:"json"`
 	// 头
