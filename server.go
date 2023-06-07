@@ -15,11 +15,12 @@ import (
 
 // Server gRPC服务器封装
 type Server struct {
+	logging.Logger
+
 	rpc    *grpc.Server
 	http   *http.Server
 	mux    *http.ServeMux
 	config server
-	logger logging.Logger
 }
 
 func newServer(config *pangu.Config, logger logging.Logger) (server *Server, mux *http.ServeMux, err error) {
@@ -46,11 +47,11 @@ func newServer(config *pangu.Config, logger logging.Logger) (server *Server, mux
 
 	mux = http.NewServeMux()
 	server = &Server{
+		Logger: logger,
+
 		rpc:    grpc.NewServer(opts...),
 		mux:    mux,
 		config: conf.Server,
-
-		logger: logger,
 	}
 
 	return
@@ -91,7 +92,7 @@ func (s *Server) startup(listener net.Listener) (err error) {
 	s.http.ReadTimeout = s.config.Timeout.Read
 	s.http.ReadHeaderTimeout = s.config.Timeout.Header
 
-	s.logger.Info("启动gRPC服务器", field.New("port", s.config.Port))
+	s.Info("启动gRPC服务器", field.New("port", s.config.Port))
 	err = s.http.Serve(listener)
 
 	return

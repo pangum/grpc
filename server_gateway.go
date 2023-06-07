@@ -68,7 +68,7 @@ func (s *Server) status(ctx context.Context, writer http.ResponseWriter, msg pro
 		// 没有设置状态
 	} else if code, ae := strconv.Atoi(status[0]); nil != ae {
 		err = ae
-		s.logger.Warn("状态码被错误设置", field.New("value", status))
+		s.Warn("状态码被错误设置", field.New("value", status))
 	} else {
 		md.HeaderMD.Delete(httpStatusHeader)
 		writer.Header().Del(grpcStatusHeader)
