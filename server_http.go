@@ -33,5 +33,6 @@ func (s *Server) fields(request *http.Request) gox.Fields[any] {
 		field.New("method", request.Method),
 		field.New("url", request.URL.String()),
 		field.New("useragent", request.UserAgent()),
+		field.New("referer", request.Referer()),
 	}
 }
