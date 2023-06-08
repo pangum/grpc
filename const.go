@@ -4,6 +4,7 @@ const (
 	space = " "
 	tcp   = "tcp"
 	slash = "/"
+	comma = ","
 
 	httpStatusHeader  = "http-code"
 	headerContentType = "Content-Type"
@@ -15,4 +16,7 @@ const (
 	grpcGatewayUri        = "grpcgateway-uri"
 	grpcGatewayMethod     = "grpcgateway-method"
 	grpcGatewayProto      = "grpcgateway-proto"
+
+	headerXRealIp       = "X-REAL-IP"
+	headerXForwardedFor = "X-FORWARDED-FOR"
 )

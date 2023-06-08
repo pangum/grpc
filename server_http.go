@@ -1,7 +1,9 @@
 package grpc
 
 import (
+	"net"
 	"net/http"
+	"strings"
 
 	"github.com/goexl/gox"
 	"github.com/goexl/gox/field"
@@ -32,8 +34,31 @@ func (s *Server) fields(request *http.Request) gox.Fields[any] {
 	return gox.Fields[any]{
 		field.New("method", request.Method),
 		field.New("url", request.URL.String()),
-		field.New("addr", request.RemoteAddr),
+		field.New("ip", s.ip(request)),
 		field.New("useragent", request.UserAgent()),
 		field.New("referer", request.Referer()),
 	}
+}
+
+func (s *Server) ip(req *http.Request) (ip string) {
+	ip = req.Header.Get(headerXRealIp)
+	if netIp := net.ParseIP(ip); nil != netIp {
+		return
+	}
+
+	ips := req.Header.Get(headerXForwardedFor)
+	for _, _ip := range strings.Split(ips, comma) {
+		ip = _ip
+		if netIP := net.ParseIP(ip); nil != netIP {
+			return
+		}
+	}
+
+	if _ip, _, err := net.SplitHostPort(req.RemoteAddr); nil == err {
+		if netIp := net.ParseIP(_ip); nil != netIp {
+			ip = _ip
+		}
+	}
+
+	return
 }
