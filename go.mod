@@ -7,7 +7,7 @@ require (
 	github.com/pangum/logging v0.2.0
 	github.com/pangum/pangu v0.3.1
 	golang.org/x/net v0.11.0
-	google.golang.org/grpc v1.56.0
+	google.golang.org/grpc v1.56.1
 	google.golang.org/protobuf v1.30.0
 )
 
