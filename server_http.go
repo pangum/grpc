@@ -25,7 +25,7 @@ func (s *Server) handler(grpc *grpc.Server, gateway http.Handler) http.Handler {
 }
 
 func (s *Server) addRawType(request *http.Request) {
-	if s.config.Gateway.Body.check(request.URL.Path) {
+	if nil != request && s.config.Gateway.Body.check(request.URL.Path) {
 		request.Header.Set(headerContentType, rawHeaderValue)
 	}
 }
