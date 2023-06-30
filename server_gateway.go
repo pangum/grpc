@@ -38,13 +38,31 @@ func (s *Server) gateway(register register) (err error) {
 
 	_gateway := runtime.NewServeMux(gatewayOpts...)
 	grpcOpts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
-	if ge := register.Gateway(_gateway, s.config.Addr(), grpcOpts...); nil != ge {
+	if ge := s.registerGateway(register, _gateway, s.config.Addr(), &grpcOpts); nil != ge {
 		err = ge
 	} else if "" == s.config.Gateway.Path {
 		s.mux.Handle(slash, _gateway)
 	} else {
 		path := s.config.Gateway.Path
 		s.mux.Handle(gox.StringBuilder(path, slash).String(), http.StripPrefix(path, _gateway))
+	}
+
+	return
+}
+
+func (s *Server) registerGateway(
+	register register,
+	mux *runtime.ServeMux, endpoint string, opts *[]grpc.DialOption,
+) (err error) {
+	ctx, handlers := register.Gateway(mux, &endpoint, opts)
+	for _, handler := range handlers {
+		if re := handler(ctx, mux, endpoint, *opts); nil != re {
+			err = re
+			s.Warn("注册网关出错", field.New("func", handler), field.Error(re))
+		}
+		if nil != err {
+			break
+		}
 	}
 
 	return
