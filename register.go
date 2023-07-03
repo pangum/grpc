@@ -14,7 +14,7 @@ type Register struct{}
 
 func (r *Register) Grpc(_ *grpc.Server) {}
 
-func (r *Register) Gateway(_ *runtime.ServeMux, _ *[]grpc.DialOption) (ctx context.Context, handlers []EndpointHandler) {
+func (r *Register) Gateway(_ *runtime.ServeMux, _ *[]grpc.DialOption) (ctx context.Context, hs []EndpointHandler) {
 	return
 }
 
