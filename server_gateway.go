@@ -54,7 +54,7 @@ func (s *Server) registerGateway(
 	register register,
 	mux *runtime.ServeMux, endpoint string, opts *[]grpc.DialOption,
 ) (err error) {
-	ctx, handlers := register.Gateway(mux, &endpoint, opts)
+	ctx, handlers := register.Gateway(mux, opts)
 	for _, handler := range handlers {
 		if re := handler(ctx, mux, endpoint, *opts); nil != re {
 			err = re
