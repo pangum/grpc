@@ -19,4 +19,9 @@ const (
 
 	headerXRealIp       = "X-REAL-IP"
 	headerXForwardedFor = "X-FORWARDED-FOR"
+	headerAllowOrigin   = "Access-Control-Allow-Origin"
+	headerAllowMethods  = "Access-Control-Allow-Methods"
+	headerAllowHeaders  = "Access-Control-Allow-Headers"
+
+	methodOptions = "OPTIONS"
 )
