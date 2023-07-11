@@ -12,16 +12,42 @@ import (
 	"google.golang.org/grpc"
 )
 
-func (s *Server) handler(grpc *grpc.Server, gateway http.Handler) http.Handler {
-	return h2c.NewHandler(http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
-		s.Debug("收到请求", s.fields(request)...)
-		if request.ProtoMajor >= 2 && grpcHeaderValue == request.Header.Get(headerContentType) {
-			grpc.ServeHTTP(writer, request)
+func (s *Server) handler(grpc *grpc.Server, gateway http.Handler) (handler http.Handler) {
+	combine := s.combine(grpc, gateway)
+	handler = gox.Ift(s.config.corsEnabled(), s.cors(combine), combine)
+
+	return
+}
+
+func (s *Server) combine(grpc *grpc.Server, gateway http.Handler) http.Handler {
+	return h2c.NewHandler(http.HandlerFunc(func(rsp http.ResponseWriter, req *http.Request) {
+		s.Debug("收到请求", s.fields(req)...)
+		if req.ProtoMajor >= 2 && grpcHeaderValue == req.Header.Get(headerContentType) {
+			grpc.ServeHTTP(rsp, req)
 		} else {
-			s.addRawType(request)
-			gateway.ServeHTTP(writer, request)
+			s.addRawType(req)
+			gateway.ServeHTTP(rsp, req)
 		}
 	}), new(http2.Server))
+}
+
+func (s *Server) cors(handler http.Handler) http.Handler {
+	return http.HandlerFunc(func(rsp http.ResponseWriter, req *http.Request) {
+		// 设置允许跨域访问的源
+		rsp.Header().Set(headerAllowOrigin, strings.Join(s.config.Cors.Allows, comma))
+		// 设置允许的请求方法
+		rsp.Header().Set(headerAllowMethods, strings.Join(s.config.Cors.Methods, comma))
+		// 设置允许的请求头
+		rsp.Header().Set(headerAllowHeaders, strings.Join(s.config.Cors.Headers, comma))
+
+		// 如果是预检请求，直接返回
+		if req.Method == methodOptions {
+			return
+		}
+
+		// 调用实际的处理器函数
+		handler.ServeHTTP(rsp, req)
+	})
 }
 
 func (s *Server) addRawType(request *http.Request) {

@@ -11,8 +11,6 @@ type gateway struct {
 	Enabled *bool `default:"true" json:"enabled" yaml:"enabled" xml:"enabled" toml:"enabled"`
 	// 路径
 	Path string `json:"path" yaml:"path" xml:"path" toml:"path" validate:"omitempty,startswith=/,endsnotwith=/"`
-	// 跨域
-	Cors cors `json:"cors" yaml:"cors" xml:"cors" toml:"cors"`
 	// 序列化
 	Json json `json:"json" yaml:"json" xml:"json" toml:"json"`
 	// 头
@@ -21,10 +19,6 @@ type gateway struct {
 	Body body `json:"body" yaml:"body" xml:"body" toml:"body"`
 	// 模式
 	Unescape *unescape `json:"unescape" yaml:"unescape" xml:"unescape" toml:"unescape"`
-}
-
-func (g *gateway) corsEnabled() bool {
-	return g.Cors.Enabled
 }
 
 func (g *gateway) options() (options []runtime.ServeMuxOption) {

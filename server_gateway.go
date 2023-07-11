@@ -37,37 +37,17 @@ func (s *Server) gateway(register register) (err error) {
 	}
 
 	_gateway := runtime.NewServeMux(gatewayOpts...)
-	_cors := gox.Ift[http.Handler](s.config.Gateway.corsEnabled(), s.cors(_gateway), _gateway)
 	grpcOpts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
 	if ge := s.registerGateway(register, _gateway, s.config.Addr(), &grpcOpts); nil != ge {
 		err = ge
 	} else if "" == s.config.Gateway.Path {
-		s.mux.Handle(slash, _cors)
+		s.mux.Handle(slash, _gateway)
 	} else {
 		path := s.config.Gateway.Path
-		s.mux.Handle(gox.StringBuilder(path, slash).String(), http.StripPrefix(path, _cors))
+		s.mux.Handle(gox.StringBuilder(path, slash).String(), http.StripPrefix(path, _gateway))
 	}
 
 	return
-}
-
-func (s *Server) cors(handler http.Handler) http.Handler {
-	return http.HandlerFunc(func(rsp http.ResponseWriter, req *http.Request) {
-		// 设置允许跨域访问的源
-		rsp.Header().Set(headerAllowOrigin, strings.Join(s.config.Gateway.Cors.Allows, comma))
-		// 设置允许的请求方法
-		rsp.Header().Set(headerAllowMethods, strings.Join(s.config.Gateway.Cors.Methods, comma))
-		// 设置允许的请求头
-		rsp.Header().Set(headerAllowHeaders, strings.Join(s.config.Gateway.Cors.Headers, comma))
-
-		// 如果是预检请求，直接返回
-		if req.Method == methodOptions {
-			return
-		}
-
-		// 调用实际的处理器函数
-		handler.ServeHTTP(rsp, req)
-	})
 }
 
 func (s *Server) registerGateway(
