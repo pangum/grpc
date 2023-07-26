@@ -2,7 +2,7 @@ package config
 
 type Cors struct {
 	// 是否开启
-	Enabled bool `json:"enabled" yaml:"enabled" xml:"enabled" toml:"enabled"`
+	Enabled *bool `json:"enabled" yaml:"enabled" xml:"enabled" toml:"enabled"`
 	// 允许跨域访问的源
 	Allows []string `default:"['*']" json:"allows" yaml:"allows" xml:"allows" toml:"allows"`
 	// 允许的请求方法

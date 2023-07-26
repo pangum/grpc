@@ -12,7 +12,7 @@ type Server struct {
 	// 网关配置
 	Gateway *Gateway `json:"Gateway" yaml:"Gateway" xml:"Gateway" toml:"Gateway"`
 	// 跨域
-	Cors Cors `json:"cors" yaml:"cors" xml:"cors" toml:"cors"`
+	Cors *Cors `json:"cors" yaml:"cors" xml:"cors" toml:"cors"`
 	// 超时
 	Timeout Timeout `json:"timeout" yaml:"timeout" xml:"timeout" toml:"timeout"`
 	// 反射
@@ -29,5 +29,5 @@ func (s *Server) GatewayEnabled() bool {
 }
 
 func (s *Server) CorsEnabled() bool {
-	return s.Cors.Enabled
+	return nil != s.Cors && *s.Cors.Enabled
 }
