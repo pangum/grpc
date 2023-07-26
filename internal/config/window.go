@@ -1,10 +1,10 @@
-package grpc
+package config
 
 import (
 	"github.com/goexl/gox"
 )
 
-type window struct {
+type Window struct {
 	// 初始
 	// 1GB
 	Initial gox.Size `default:"1GB" json:"initial" yaml:"initial" xml:"initial" toml:"initial"`

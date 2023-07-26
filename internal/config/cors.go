@@ -1,6 +1,6 @@
-package grpc
+package config
 
-type cors struct {
+type Cors struct {
 	// 是否开启
 	Enabled bool `json:"enabled" yaml:"enabled" xml:"enabled" toml:"enabled"`
 	// 允许跨域访问的源

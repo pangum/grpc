@@ -1,35 +1,36 @@
-package grpc
+package config
 
 import (
 	"github.com/goexl/gox"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/pangum/grpc/internal"
 	"google.golang.org/protobuf/encoding/protojson"
 )
 
-type gateway struct {
+type Gateway struct {
 	// 是否开启
 	Enabled *bool `default:"true" json:"enabled" yaml:"enabled" xml:"enabled" toml:"enabled"`
 	// 路径
 	Path string `json:"path" yaml:"path" xml:"path" toml:"path" validate:"omitempty,startswith=/,endsnotwith=/"`
 	// 序列化
-	Json json `json:"json" yaml:"json" xml:"json" toml:"json"`
+	Json Json `json:"json" yaml:"json" xml:"json" toml:"json"`
 	// 头
-	Header header `json:"header" yaml:"header" xml:"header" toml:"header"`
+	Header Header `json:"header" yaml:"header" xml:"header" toml:"header"`
 	// 消息体
-	Body body `json:"body" yaml:"body" xml:"body" toml:"body"`
+	Body Body `json:"Body" yaml:"Body" xml:"Body" toml:"Body"`
 	// 模式
-	Unescape *unescape `json:"unescape" yaml:"unescape" xml:"unescape" toml:"unescape"`
+	Unescape *Unescape `json:"unescape" yaml:"unescape" xml:"unescape" toml:"unescape"`
 }
 
-func (g *gateway) options() (options []runtime.ServeMuxOption) {
+func (g *Gateway) Options() (options []runtime.ServeMuxOption) {
 	options = make([]runtime.ServeMuxOption, 0, 1)
 	options = append(options, runtime.WithMarshalerOption(runtime.MIMEWildcard, &runtime.JSONPb{
 		MarshalOptions: protojson.MarshalOptions{
 			Multiline:       g.Json.Multiline,
 			Indent:          g.Json.Indent,
 			AllowPartial:    g.Json.Partial,
-			UseProtoNames:   gox.Contains(&g.Json.Options, nameAsProto),
-			UseEnumNumbers:  gox.Contains(&g.Json.Options, enumAsNumbers),
+			UseProtoNames:   gox.Contains(&g.Json.Options, internal.NameAsProto),
+			UseEnumNumbers:  gox.Contains(&g.Json.Options, internal.EnumAsNumbers),
 			EmitUnpopulated: *g.Json.Unpopulated,
 		},
 		UnmarshalOptions: protojson.UnmarshalOptions{

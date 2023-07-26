@@ -1,10 +1,10 @@
-package grpc
+package config
 
 import (
 	"time"
 )
 
-type timeout struct {
+type Timeout struct {
 	// 读
 	Read time.Duration `default:"15s" json:"read" yaml:"read" xml:"read" toml:"read"`
 	// 头

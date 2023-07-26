@@ -1,10 +1,10 @@
-package grpc
+package config
 
 import (
 	"strings"
 )
 
-type matcher struct {
+type Matcher struct {
 	// 等于
 	Equal string `json:"equal" yaml:"equal" xml:"equal" toml:"equal"`
 	// 前缀
@@ -15,7 +15,7 @@ type matcher struct {
 	Contains string `json:"contains" yaml:"contains" xml:"contains" toml:"contains"`
 }
 
-func (m *matcher) test(key string) (new string, match bool) {
+func (m *Matcher) Test(key string) (new string, match bool) {
 	key = strings.ToLower(key)
 	new = key
 	if "" != m.Equal && m.Equal == key {

@@ -10,6 +10,8 @@ import (
 	"github.com/goexl/gox"
 	"github.com/goexl/gox/field"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/pangum/grpc/internal"
+	"github.com/pangum/grpc/internal/decoder"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/metadata"
@@ -17,12 +19,12 @@ import (
 )
 
 func (s *Server) gateway(register register) (err error) {
-	if !s.config.gatewayEnabled() {
+	if !s.config.GatewayEnabled() {
 		return
 	}
 
 	pb := new(runtime.JSONPb)
-	gatewayOpts := s.config.Gateway.options()
+	gatewayOpts := s.config.Gateway.Options()
 	gatewayOpts = append(gatewayOpts, runtime.WithForwardResponseOption(s.response))
 	gatewayOpts = append(gatewayOpts, runtime.WithIncomingHeaderMatcher(s.in))
 	gatewayOpts = append(gatewayOpts, runtime.WithOutgoingHeaderMatcher(s.out))
@@ -31,7 +33,7 @@ func (s *Server) gateway(register register) (err error) {
 	// 确保内置解码器被正确的设置，防止其它请求无法解出数据
 	gatewayOpts = append(gatewayOpts, runtime.WithMarshalerOption(runtime.MIMEWildcard, pb))
 	// 使用特定的解码器来处理原始数据
-	gatewayOpts = append(gatewayOpts, runtime.WithMarshalerOption(rawHeaderValue, newRawDecoder(pb)))
+	gatewayOpts = append(gatewayOpts, runtime.WithMarshalerOption(internal.RawHeaderValue, decoder.NewRaw(pb)))
 	if nil != s.config.Gateway.Unescape {
 		gatewayOpts = append(gatewayOpts, runtime.WithUnescapingMode(s.config.Gateway.Unescape.Mode))
 	}
@@ -41,10 +43,10 @@ func (s *Server) gateway(register register) (err error) {
 	if ge := s.registerGateway(register, _gateway, s.config.Addr(), &grpcOpts); nil != ge {
 		err = ge
 	} else if "" == s.config.Gateway.Path {
-		s.mux.Handle(slash, _gateway)
+		s.mux.Handle(internal.Slash, _gateway)
 	} else {
 		path := s.config.Gateway.Path
-		s.mux.Handle(gox.StringBuilder(path, slash).String(), http.StripPrefix(path, _gateway))
+		s.mux.Handle(gox.StringBuilder(path, internal.Slash).String(), http.StripPrefix(path, _gateway))
 	}
 
 	return
@@ -82,14 +84,14 @@ func (s *Server) response(ctx context.Context, writer http.ResponseWriter, msg p
 func (s *Server) status(ctx context.Context, writer http.ResponseWriter, msg proto.Message) (err error) {
 	if md, ok := runtime.ServerMetadataFromContext(ctx); !ok {
 		// 上下文无法转换
-	} else if status := md.HeaderMD.Get(httpStatusHeader); 0 == len(status) {
+	} else if status := md.HeaderMD.Get(internal.HttpStatusHeader); 0 == len(status) {
 		// 没有设置状态
 	} else if code, ae := strconv.Atoi(status[0]); nil != ae {
 		err = ae
 		s.Warn("状态码被错误设置", field.New("value", status))
 	} else {
-		md.HeaderMD.Delete(httpStatusHeader)
-		writer.Header().Del(grpcStatusHeader)
+		md.HeaderMD.Delete(internal.HttpStatusHeader)
+		writer.Header().Del(internal.GrpcStatusHeader)
 		writer.WriteHeader(code)
 	}
 	fmt.Println(msg)
@@ -104,18 +106,18 @@ func (s *Server) header(ctx context.Context, writer http.ResponseWriter, _ proto
 	}
 
 	for key, value := range header {
-		if httpStatusHeader == key { // 不处理设置状态码的逻辑，由状态码设置逻辑特殊处理
+		if internal.HttpStatusHeader == key { // 不处理设置状态码的逻辑，由状态码设置逻辑特殊处理
 			continue
 		}
 
 		newKey := strings.ToLower(key)
 		removal := false
-		newKey, removal = s.config.Gateway.Header.testRemove(newKey)
+		newKey, removal = s.config.Gateway.Header.TestRemove(newKey)
 
 		if removal {
-			writer.Header().Set(newKey, strings.Join(value, space))
+			writer.Header().Set(newKey, strings.Join(value, internal.Space))
 			header.Delete(key)
-			writer.Header().Del(fmt.Sprintf(grpcMetadataFormatter, key))
+			writer.Header().Del(fmt.Sprintf(internal.GrpcMetadataFormatter, key))
 		}
 	}
 
@@ -123,7 +125,7 @@ func (s *Server) header(ctx context.Context, writer http.ResponseWriter, _ proto
 }
 
 func (s *Server) in(key string) (new string, match bool) {
-	if newKey, test := s.config.Gateway.Header.testIns(key); test {
+	if newKey, test := s.config.Gateway.Header.TestIns(key); test {
 		new = newKey
 		match = true
 	} else {
@@ -134,7 +136,7 @@ func (s *Server) in(key string) (new string, match bool) {
 }
 
 func (s *Server) out(key string) (new string, match bool) {
-	if newKey, test := s.config.Gateway.Header.testOuts(key); test {
+	if newKey, test := s.config.Gateway.Header.TestOuts(key); test {
 		new = newKey
 		match = true
 	} else {
@@ -146,9 +148,9 @@ func (s *Server) out(key string) (new string, match bool) {
 
 func (s *Server) metadata(_ context.Context, req *http.Request) metadata.MD {
 	md := make(map[string]string)
-	md[grpcGatewayUri] = req.URL.RequestURI()
-	md[grpcGatewayMethod] = req.Method
-	md[grpcGatewayProto] = req.Proto
+	md[internal.GrpcGatewayUri] = req.URL.RequestURI()
+	md[internal.GrpcGatewayMethod] = req.Method
+	md[internal.GrpcGatewayProto] = req.Proto
 
 	return metadata.New(md)
 }

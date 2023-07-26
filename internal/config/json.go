@@ -1,6 +1,6 @@
-package grpc
+package config
 
-type json struct {
+type Json struct {
 	// 是否允许多行
 	Multiline bool `json:"multiline" yaml:"multiline" xml:"multiline" toml:"multiline"`
 	// 前缀

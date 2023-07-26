@@ -6,6 +6,9 @@ import (
 	"net/http"
 
 	"github.com/goexl/gox/field"
+	"github.com/pangum/grpc/internal"
+	config2 "github.com/pangum/grpc/internal/config"
+	"github.com/pangum/grpc/internal/core"
 	"github.com/pangum/logging"
 	"github.com/pangum/pangu"
 	"google.golang.org/grpc"
@@ -20,11 +23,11 @@ type Server struct {
 	rpc    *grpc.Server
 	http   *http.Server
 	mux    *http.ServeMux
-	config server
+	config config2.Server
 }
 
 func newServer(config *pangu.Config, logger logging.Logger) (server *Server, mux *http.ServeMux, err error) {
-	wrap := new(wrapper)
+	wrap := new(core.Wrapper)
 	if err = config.Load(wrap); nil != err {
 		return
 	}
@@ -57,20 +60,15 @@ func newServer(config *pangu.Config, logger logging.Logger) (server *Server, mux
 	return
 }
 
-func (s *Server) Serve(register register, opts ...serveOption) (err error) {
-	_options := defaultServeOptions()
-	for _, opt := range opts {
-		opt.apply(_options)
-	}
-
-	if _options.Reflection { // 反射，在gRPC接口调试时，可以反射出方法和参数
+func (s *Server) Serve(register register) (err error) {
+	if *s.config.Reflection { // 反射，在gRPC接口调试时，可以反射出方法和参数
 		reflection.Register(s.rpc)
 	}
 
-	if listener, le := net.Listen(tcp, s.config.Addr()); nil != le {
+	if listener, le := net.Listen(internal.Tcp, s.config.Addr()); nil != le {
 		err = le
-	} else if re := s.grpc(register); nil != re {
-		err = re
+	} else if gre := s.grpc(register); nil != gre {
+		err = gre
 	} else if gwe := s.gateway(register); nil != gwe {
 		err = gwe
 	} else {

@@ -1,10 +1,10 @@
-package grpc
+package config
 
 import (
 	"github.com/goexl/gox"
 )
 
-type msg struct {
+type Msg struct {
 	// 发送大小
 	// 4GB
 	Send gox.Size `default:"4GB" json:"send" yaml:"send" xml:"send" toml:"send"`

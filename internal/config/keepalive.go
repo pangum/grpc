@@ -1,10 +1,10 @@
-package grpc
+package config
 
 import (
 	"time"
 )
 
-type _keepalive struct {
+type Keepalive struct {
 	// 保持时长
 	Time time.Duration `default:"10s" json:"time" yaml:"time" xml:"time" toml:"time"`
 	// 超时
@@ -12,5 +12,5 @@ type _keepalive struct {
 	// 空闲时长
 	Idle time.Duration `default:"3s" json:"idle" yaml:"idle" xml:"idle" toml:"idle"`
 	// 策略
-	Policy keepalivePolicy `json:"policy" yaml:"policy" xml:"policy" toml:"policy"`
+	Policy KeepalivePolicy `json:"policy" yaml:"policy" xml:"policy" toml:"policy"`
 }

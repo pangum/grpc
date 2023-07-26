@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"github.com/goexl/gox"
+	"github.com/pangum/grpc/internal/core"
 	"github.com/pangum/pangu"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -16,7 +17,7 @@ type Client struct {
 }
 
 func newClient(config *pangu.Config) (client *Client, err error) {
-	wrap := new(wrapper)
+	wrap := new(core.Wrapper)
 	if err = config.Load(wrap); nil != err {
 		return
 	}

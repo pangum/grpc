@@ -1,6 +1,6 @@
-package grpc
+package config
 
-type clientConfig struct {
+type Client struct {
 	// 名称
 	Name string `json:"name" yaml:"name" xml:"name" toml:"name" validate:"required_without=Names"`
 	// 名称列表
