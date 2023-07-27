@@ -10,7 +10,7 @@ type Server struct {
 	// 绑定监听端口
 	Port int `default:"9001" json:"port" yaml:"port" xml:"port" toml:"port" validate:"required,min=1,max=65535"`
 	// 网关配置
-	Gateway *Gateway `json:"Gateway" yaml:"Gateway" xml:"Gateway" toml:"Gateway"`
+	Gateway *Gateway `json:"gateway" yaml:"gateway" xml:"gateway" toml:"gateway"`
 	// 跨域
 	Cors *Cors `json:"cors" yaml:"cors" xml:"cors" toml:"cors"`
 	// 超时

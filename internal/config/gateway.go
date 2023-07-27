@@ -17,7 +17,7 @@ type Gateway struct {
 	// 头
 	Header Header `json:"header" yaml:"header" xml:"header" toml:"header"`
 	// 消息体
-	Body Body `json:"Body" yaml:"Body" xml:"Body" toml:"Body"`
+	Body Body `json:"body" yaml:"body" xml:"body" toml:"body"`
 	// 模式
 	Unescape *Unescape `json:"unescape" yaml:"unescape" xml:"unescape" toml:"unescape"`
 }
