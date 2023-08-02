@@ -6,7 +6,7 @@ require (
 	github.com/goexl/gox v0.3.6
 	github.com/pangum/logging v0.2.0
 	github.com/pangum/pangu v0.3.2
-	golang.org/x/net v0.12.0
+	golang.org/x/net v0.13.0
 	google.golang.org/grpc v1.57.0
 	google.golang.org/protobuf v1.31.0
 )
