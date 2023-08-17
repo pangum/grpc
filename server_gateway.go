@@ -15,6 +15,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/metadata"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -30,6 +31,7 @@ func (s *Server) gateway(register register) (err error) {
 	gatewayOpts = append(gatewayOpts, runtime.WithOutgoingHeaderMatcher(s.out))
 	gatewayOpts = append(gatewayOpts, runtime.WithMetadata(s.metadata))
 	gatewayOpts = append(gatewayOpts, runtime.WithMetadata(s.metadata))
+	gatewayOpts = append(gatewayOpts, runtime.WithErrorHandler(s.error))
 	// 确保内置解码器被正确的设置，防止其它请求无法解出数据
 	gatewayOpts = append(gatewayOpts, runtime.WithMarshalerOption(runtime.MIMEWildcard, pb))
 	// 使用特定的解码器来处理原始数据
@@ -84,11 +86,11 @@ func (s *Server) response(ctx context.Context, writer http.ResponseWriter, msg p
 func (s *Server) status(ctx context.Context, writer http.ResponseWriter, msg proto.Message) (err error) {
 	if md, ok := runtime.ServerMetadataFromContext(ctx); !ok {
 		// 上下文无法转换
-	} else if status := md.HeaderMD.Get(internal.HttpStatusHeader); 0 == len(status) {
+	} else if _status := md.HeaderMD.Get(internal.HttpStatusHeader); 0 == len(_status) {
 		// 没有设置状态
-	} else if code, ae := strconv.Atoi(status[0]); nil != ae {
+	} else if code, ae := strconv.Atoi(_status[0]); nil != ae {
 		err = ae
-		s.Warn("状态码被错误设置", field.New("value", status))
+		s.Warn("状态码被错误设置", field.New("value", _status))
 	} else {
 		md.HeaderMD.Delete(internal.HttpStatusHeader)
 		writer.Header().Del(internal.GrpcStatusHeader)
@@ -97,6 +99,18 @@ func (s *Server) status(ctx context.Context, writer http.ResponseWriter, msg pro
 	fmt.Println(msg)
 
 	return
+}
+
+func (s *Server) error(
+	_ context.Context, _ *runtime.ServeMux, _ runtime.Marshaler,
+	writer http.ResponseWriter, _ *http.Request,
+	err error,
+) {
+	writer.WriteHeader(http.StatusInternalServerError)
+	if _status, ok := status.FromError(err); ok {
+		bytes := []byte(_status.Message())
+		_, _ = writer.Write(bytes)
+	}
 }
 
 func (s *Server) header(ctx context.Context, writer http.ResponseWriter, _ proto.Message) (err error) {
