@@ -13,7 +13,7 @@ require (
 
 require (
 	github.com/goexl/exc v0.0.5
-	github.com/grpc-ecosystem/grpc-gateway/v2 v2.17.1
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.18.0
 )
 
 require (
