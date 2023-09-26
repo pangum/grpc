@@ -8,7 +8,8 @@ type Json struct {
 	// 允许部分
 	Partial bool `json:"partial" yaml:"partial" xml:"partial" toml:"partial"`
 	// 选项列表
-	Options []string `json:"options" yaml:"options" xml:"options" toml:"options"`
+	// nolint: lll
+	Options []string `default:"['enum_as_numbers', 'name_as_proto']" json:"options" yaml:"options" xml:"options" toml:"options"`
 	// 是否允许不填充
 	Unpopulated *bool `default:"true" json:"unpopulated" yaml:"unpopulated" xml:"unpopulated" toml:"unpopulated"`
 	// 是否允许丢弃
