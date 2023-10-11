@@ -24,7 +24,6 @@ func (s *Server) gateway(register register) (err error) {
 		return
 	}
 
-	pb := new(runtime.JSONPb)
 	gatewayOpts := s.config.Gateway.Options()
 	gatewayOpts = append(gatewayOpts, runtime.WithForwardResponseOption(s.response))
 	gatewayOpts = append(gatewayOpts, runtime.WithIncomingHeaderMatcher(s.in))
@@ -32,10 +31,8 @@ func (s *Server) gateway(register register) (err error) {
 	gatewayOpts = append(gatewayOpts, runtime.WithMetadata(s.metadata))
 	gatewayOpts = append(gatewayOpts, runtime.WithMetadata(s.metadata))
 	gatewayOpts = append(gatewayOpts, runtime.WithErrorHandler(s.error))
-	// 确保内置解码器被正确的设置，防止其它请求无法解出数据
-	gatewayOpts = append(gatewayOpts, runtime.WithMarshalerOption(runtime.MIMEWildcard, pb))
 	// 使用特定的解码器来处理原始数据
-	gatewayOpts = append(gatewayOpts, runtime.WithMarshalerOption(internal.RawHeaderValue, decoder.NewRaw(pb)))
+	gatewayOpts = append(gatewayOpts, runtime.WithMarshalerOption(internal.RawHeaderValue, decoder.NewRaw()))
 	if nil != s.config.Gateway.Unescape {
 		gatewayOpts = append(gatewayOpts, runtime.WithUnescapingMode(s.config.Gateway.Unescape.Mode))
 	}

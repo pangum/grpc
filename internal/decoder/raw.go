@@ -16,9 +16,9 @@ type Raw struct {
 	bytesType reflect.Type
 }
 
-func NewRaw(pb *runtime.JSONPb) *Raw {
+func NewRaw() *Raw {
 	return &Raw{
-		JSONPb: pb,
+		JSONPb: new(runtime.JSONPb),
 
 		bytesType: reflect.TypeOf([]byte(nil)),
 	}

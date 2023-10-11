@@ -24,7 +24,7 @@ type Gateway struct {
 
 func (g *Gateway) Options() (options []runtime.ServeMuxOption) {
 	options = make([]runtime.ServeMuxOption, 0, 1)
-	options = append(options, runtime.WithMarshalerOption(runtime.MIMEWildcard, &runtime.JSONPb{
+	json := &runtime.JSONPb{
 		MarshalOptions: protojson.MarshalOptions{
 			Multiline:       g.Json.Multiline,
 			Indent:          g.Json.Indent,
@@ -37,7 +37,8 @@ func (g *Gateway) Options() (options []runtime.ServeMuxOption) {
 			AllowPartial:   g.Json.Partial,
 			DiscardUnknown: *g.Json.Discard,
 		},
-	}))
+	}
+	options = append(options, runtime.WithMarshalerOption(runtime.MIMEWildcard, json))
 
 	return
 }
