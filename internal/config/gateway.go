@@ -31,7 +31,7 @@ func (g *Gateway) Options() (options []runtime.ServeMuxOption) {
 			AllowPartial:    g.Json.Partial,
 			UseProtoNames:   gox.Contains(&g.Json.Options, internal.NameAsProto),
 			UseEnumNumbers:  gox.Contains(&g.Json.Options, internal.EnumAsNumbers),
-			EmitUnpopulated: *g.Json.Unpopulated,
+			EmitUnpopulated: g.Json.Unpopulated,
 		},
 		UnmarshalOptions: protojson.UnmarshalOptions{
 			AllowPartial:   g.Json.Partial,
