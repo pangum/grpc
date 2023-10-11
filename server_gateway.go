@@ -73,14 +73,14 @@ func (s *Server) response(ctx context.Context, writer http.ResponseWriter, msg p
 	// 注意，这儿的顺序不能乱，必须先写入头再写入状态码
 	if se := s.header(ctx, writer, msg); nil != se {
 		err = se
-	} else if he := s.status(ctx, writer, msg); nil != he {
+	} else if he := s.status(ctx, writer); nil != he {
 		err = he
 	}
 
 	return
 }
 
-func (s *Server) status(ctx context.Context, writer http.ResponseWriter, msg proto.Message) (err error) {
+func (s *Server) status(ctx context.Context, writer http.ResponseWriter) (err error) {
 	if md, ok := runtime.ServerMetadataFromContext(ctx); !ok {
 		// 上下文无法转换
 	} else if _status := md.HeaderMD.Get(internal.HttpStatusHeader); 0 == len(_status) {
@@ -93,7 +93,6 @@ func (s *Server) status(ctx context.Context, writer http.ResponseWriter, msg pro
 		writer.Header().Del(internal.GrpcStatusHeader)
 		writer.WriteHeader(code)
 	}
-	fmt.Println(msg)
 
 	return
 }
