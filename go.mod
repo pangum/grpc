@@ -7,7 +7,7 @@ require (
 	github.com/pangum/logging v0.2.0
 	github.com/pangum/pangu v0.3.2
 	golang.org/x/net v0.17.0
-	google.golang.org/grpc v1.58.3
+	google.golang.org/grpc v1.59.0
 	google.golang.org/protobuf v1.31.0
 )
 
@@ -31,7 +31,7 @@ require (
 	github.com/goexl/simaqian v0.2.5 // indirect
 	github.com/goexl/xiren v0.0.5 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
-	github.com/google/uuid v1.3.0 // indirect
+	github.com/google/uuid v1.3.1 // indirect
 	github.com/leodido/go-urn v1.2.4 // indirect
 	github.com/pelletier/go-toml v1.9.5 // indirect
 	github.com/rogpeppe/go-internal v1.10.0 // indirect
