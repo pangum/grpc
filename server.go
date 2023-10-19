@@ -6,10 +6,10 @@ import (
 	"net/http"
 
 	"github.com/goexl/gox/field"
+	"github.com/goexl/simaqian"
 	"github.com/pangum/grpc/internal"
-	config2 "github.com/pangum/grpc/internal/config"
+	"github.com/pangum/grpc/internal/config"
 	"github.com/pangum/grpc/internal/core"
-	"github.com/pangum/logging"
 	"github.com/pangum/pangu"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/keepalive"
@@ -18,15 +18,15 @@ import (
 
 // Server gRPC服务器封装
 type Server struct {
-	logging.Logger
+	simaqian.Logger
 
 	rpc    *grpc.Server
 	http   *http.Server
 	mux    *http.ServeMux
-	config config2.Server
+	config config.Server
 }
 
-func newServer(config *pangu.Config, logger logging.Logger) (server *Server, mux *http.ServeMux, err error) {
+func newServer(config *pangu.Config, logger simaqian.Logger) (server *Server, mux *http.ServeMux, err error) {
 	wrap := new(core.Wrapper)
 	if err = config.Load(wrap); nil != err {
 		return
