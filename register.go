@@ -18,6 +18,14 @@ func (r *Register) Gateway(_ *runtime.ServeMux, _ *[]grpc.DialOption) (ctx conte
 	return
 }
 
+func (r *Register) Before() (err error) {
+	return
+}
+
+func (r *Register) After() (err error) {
+	return
+}
+
 type register interface {
 	// Grpc gRPC服务
 	Grpc(server *grpc.Server)
