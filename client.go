@@ -18,7 +18,7 @@ type Client struct {
 
 func newClient(config *pangu.Config) (client *Client, err error) {
 	wrap := new(core.Wrapper)
-	if err = config.Load(wrap); nil != err {
+	if err = config.Build().Get(wrap); nil != err {
 		return
 	}
 

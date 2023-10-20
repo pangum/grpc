@@ -28,7 +28,7 @@ type Server struct {
 
 func newServer(config *pangu.Config, logger simaqian.Logger) (server *Server, mux *http.ServeMux, err error) {
 	wrap := new(core.Wrapper)
-	if err = config.Load(wrap); nil != err {
+	if err = config.Build().Get(wrap); nil != err {
 		return
 	}
 
