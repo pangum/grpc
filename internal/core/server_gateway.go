@@ -1,4 +1,4 @@
-package grpc
+package core
 
 import (
 	"context"
@@ -19,7 +19,7 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-func (s *Server) gateway(register register) (err error) {
+func (s *Server) gateway(register Register) (err error) {
 	if !s.config.GatewayEnabled() {
 		return
 	}
@@ -52,14 +52,15 @@ func (s *Server) gateway(register register) (err error) {
 }
 
 func (s *Server) registerGateway(
-	register register,
-	mux *runtime.ServeMux, endpoint string, opts *[]grpc.DialOption,
+	register Register,
+	mux *runtime.ServeMux,
+	endpoint string, opts *[]grpc.DialOption,
 ) (err error) {
 	ctx, handlers := register.Gateway(mux, opts)
 	for _, handler := range handlers {
 		if re := handler(ctx, mux, endpoint, *opts); nil != re {
 			err = re
-			s.Warn("注册网关出错", field.New("func", handler), field.Error(re))
+			s.logger.Warn("注册网关出错", field.New("func", handler), field.Error(re))
 		}
 		if nil != err {
 			break
@@ -87,7 +88,7 @@ func (s *Server) status(ctx context.Context, writer http.ResponseWriter) (err er
 		// 没有设置状态
 	} else if code, ae := strconv.Atoi(_status[0]); nil != ae {
 		err = ae
-		s.Warn("状态码被错误设置", field.New("value", _status))
+		s.logger.Warn("状态码被错误设置", field.New("value", _status))
 	} else {
 		md.HeaderMD.Delete(internal.HttpStatusHeader)
 		writer.Header().Del(internal.GrpcStatusHeader)

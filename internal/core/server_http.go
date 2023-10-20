@@ -1,4 +1,4 @@
-package grpc
+package core
 
 import (
 	"net"
@@ -22,7 +22,7 @@ func (s *Server) handler(grpc *grpc.Server, gateway http.Handler) (handler http.
 
 func (s *Server) combine(grpc *grpc.Server, gateway http.Handler) http.Handler {
 	return h2c.NewHandler(http.HandlerFunc(func(rsp http.ResponseWriter, req *http.Request) {
-		s.Debug("收到请求", s.fields(req)...)
+		s.logger.Debug("收到请求", s.fields(req)...)
 		if req.ProtoMajor >= 2 && internal.GrpcHeaderValue == req.Header.Get(internal.HeaderContentType) {
 			grpc.ServeHTTP(rsp, req)
 		} else {

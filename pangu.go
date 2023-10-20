@@ -1,10 +1,14 @@
 package grpc
 
-import "github.com/pangum/pangu"
+import (
+	"github.com/pangum/grpc/internal/plugin"
+	"github.com/pangum/pangu"
+)
 
 func init() {
+	creator := new(plugin.Creator)
 	pangu.New().Get().Dependencies().Build().Provide(
-		newServer,
-		newClient,
+		creator.New,
+		creator.NewClient,
 	)
 }

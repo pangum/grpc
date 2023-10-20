@@ -4,17 +4,18 @@ import (
 	"context"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/pangum/grpc/internal/core"
 	"google.golang.org/grpc"
 )
 
-var _ register = (*Register)(nil)
+var _ core.Register = (*Register)(nil)
 
 // Register 空白注册器
 type Register struct{}
 
 func (r *Register) Grpc(_ *grpc.Server) {}
 
-func (r *Register) Gateway(_ *runtime.ServeMux, _ *[]grpc.DialOption) (ctx context.Context, handlers EndpointHandlers) {
+func (r *Register) Gateway(_ *runtime.ServeMux, _ *[]grpc.DialOption) (ctx context.Context, handlers core.Handlers) {
 	return
 }
 
@@ -24,12 +25,4 @@ func (r *Register) Before() (err error) {
 
 func (r *Register) After() (err error) {
 	return
-}
-
-type register interface {
-	// Grpc gRPC服务
-	Grpc(server *grpc.Server)
-
-	// Gateway 网关服务
-	Gateway(mux *runtime.ServeMux, opts *[]grpc.DialOption) (ctx context.Context, handlers EndpointHandlers)
 }

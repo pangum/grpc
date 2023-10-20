@@ -4,5 +4,5 @@ import (
 	"github.com/pangum/grpc/internal/core"
 )
 
-// Server 服务器
-type Server = core.Server
+// Handlers 注册列表
+type Handlers = core.Handlers
