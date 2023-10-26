@@ -7,8 +7,8 @@ import (
 
 func init() {
 	creator := new(plugin.Creator)
-	pangu.New().Get().Dependencies().Build().Provide(
+	pangu.New().Get().Dependency().Put(
 		creator.New,
 		creator.NewClient,
-	)
+	).Build().Build().Apply()
 }

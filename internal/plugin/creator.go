@@ -3,7 +3,7 @@ package plugin
 import (
 	"net/http"
 
-	"github.com/goexl/simaqian"
+	"github.com/goexl/log"
 	"github.com/pangum/grpc/internal/core"
 	"github.com/pangum/pangu"
 	"google.golang.org/grpc"
@@ -15,7 +15,7 @@ type Creator struct {
 	// 解决命名空间问题
 }
 
-func (c *Creator) New(config *pangu.Config, logger simaqian.Logger) (server *core.Server, mux *http.ServeMux, err error) {
+func (c *Creator) New(config *pangu.Config, logger log.Logger) (server *core.Server, mux *http.ServeMux, err error) {
 	wrapper := new(Wrapper)
 	if ge := config.Build().Get(wrapper); nil != ge {
 		err = ge
@@ -37,7 +37,7 @@ func (c *Creator) NewClient(config *pangu.Config) (client *core.Client, err erro
 	return
 }
 
-func (c *Creator) new(config *Config, logger simaqian.Logger) (server *core.Server, mux *http.ServeMux, err error) {
+func (c *Creator) new(config *Config, logger log.Logger) (server *core.Server, mux *http.ServeMux, err error) {
 	if nil == config.Server {
 		return
 	}
@@ -57,7 +57,7 @@ func (c *Creator) new(config *Config, logger simaqian.Logger) (server *core.Serv
 	}))
 
 	mux = http.NewServeMux()
-	server = core.NewServer(grpc.NewServer(opts...), mux, config.Server, logger)
+	server = core.NewServer(grpc.NewServer(opts...), mux, config.Server, config.Gateway, logger)
 
 	return
 }

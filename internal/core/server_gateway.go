@@ -10,8 +10,8 @@ import (
 	"github.com/goexl/gox"
 	"github.com/goexl/gox/field"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
-	"github.com/pangum/grpc/internal"
 	"github.com/pangum/grpc/internal/decoder"
+	"github.com/pangum/grpc/internal/internal/constant"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/metadata"
@@ -20,7 +20,7 @@ import (
 )
 
 func (s *Server) gateway(register Register) (err error) {
-	if !s.config.GatewayEnabled() {
+	if !s.config.Gateway.Enable() {
 		return
 	}
 
@@ -32,20 +32,20 @@ func (s *Server) gateway(register Register) (err error) {
 	gatewayOpts = append(gatewayOpts, runtime.WithMetadata(s.metadata))
 	gatewayOpts = append(gatewayOpts, runtime.WithErrorHandler(s.error))
 	// 使用特定的解码器来处理原始数据
-	gatewayOpts = append(gatewayOpts, runtime.WithMarshalerOption(internal.RawHeaderValue, decoder.NewRaw()))
+	gatewayOpts = append(gatewayOpts, runtime.WithMarshalerOption(constant.RawHeaderValue, decoder.NewRaw()))
 	if nil != s.config.Gateway.Unescape {
 		gatewayOpts = append(gatewayOpts, runtime.WithUnescapingMode(s.config.Gateway.Unescape.Mode))
 	}
 
 	_gateway := runtime.NewServeMux(gatewayOpts...)
 	grpcOpts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
-	if ge := s.registerGateway(register, _gateway, s.config.Addr(), &grpcOpts); nil != ge {
+	if ge := s.registerGateway(register, _gateway, s.config.Gateway.Addr(), &grpcOpts); nil != ge {
 		err = ge
 	} else if "" == s.config.Gateway.Path {
-		s.mux.Handle(internal.Slash, _gateway)
+		s.mux.Handle(constant.Slash, _gateway)
 	} else {
 		path := s.config.Gateway.Path
-		s.mux.Handle(gox.StringBuilder(path, internal.Slash).String(), http.StripPrefix(path, _gateway))
+		s.mux.Handle(gox.StringBuilder(path, constant.Slash).String(), http.StripPrefix(path, _gateway))
 	}
 
 	return
@@ -54,11 +54,11 @@ func (s *Server) gateway(register Register) (err error) {
 func (s *Server) registerGateway(
 	register Register,
 	mux *runtime.ServeMux,
-	endpoint string, opts *[]grpc.DialOption,
+	endpoint string, options *[]grpc.DialOption,
 ) (err error) {
-	ctx, handlers := register.Gateway(mux, opts)
+	ctx, handlers := register.Gateway(mux, options)
 	for _, handler := range handlers {
-		if re := handler(ctx, mux, endpoint, *opts); nil != re {
+		if re := handler(ctx, mux, endpoint, *options); nil != re {
 			err = re
 			s.logger.Warn("注册网关出错", field.New("func", handler), field.Error(re))
 		}
@@ -84,14 +84,14 @@ func (s *Server) response(ctx context.Context, writer http.ResponseWriter, msg p
 func (s *Server) status(ctx context.Context, writer http.ResponseWriter) (err error) {
 	if md, ok := runtime.ServerMetadataFromContext(ctx); !ok {
 		// 上下文无法转换
-	} else if _status := md.HeaderMD.Get(internal.HttpStatusHeader); 0 == len(_status) {
+	} else if _status := md.HeaderMD.Get(constant.HttpStatusHeader); 0 == len(_status) {
 		// 没有设置状态
 	} else if code, ae := strconv.Atoi(_status[0]); nil != ae {
 		err = ae
 		s.logger.Warn("状态码被错误设置", field.New("value", _status))
 	} else {
-		md.HeaderMD.Delete(internal.HttpStatusHeader)
-		writer.Header().Del(internal.GrpcStatusHeader)
+		md.HeaderMD.Delete(constant.HttpStatusHeader)
+		writer.Header().Del(constant.GrpcStatusHeader)
 		writer.WriteHeader(code)
 	}
 
@@ -117,7 +117,7 @@ func (s *Server) header(ctx context.Context, writer http.ResponseWriter, _ proto
 	}
 
 	for key, value := range header {
-		if internal.HttpStatusHeader == key { // 不处理设置状态码的逻辑，由状态码设置逻辑特殊处理
+		if constant.HttpStatusHeader == key { // 不处理设置状态码的逻辑，由状态码设置逻辑特殊处理
 			continue
 		}
 
@@ -126,9 +126,9 @@ func (s *Server) header(ctx context.Context, writer http.ResponseWriter, _ proto
 		newKey, removal = s.config.Gateway.Header.TestRemove(newKey)
 
 		if removal {
-			writer.Header().Set(newKey, strings.Join(value, internal.Space))
+			writer.Header().Set(newKey, strings.Join(value, constant.Space))
 			header.Delete(key)
-			writer.Header().Del(fmt.Sprintf(internal.GrpcMetadataFormatter, key))
+			writer.Header().Del(fmt.Sprintf(constant.GrpcMetadataFormatter, key))
 		}
 	}
 
@@ -159,9 +159,9 @@ func (s *Server) out(key string) (new string, match bool) {
 
 func (s *Server) metadata(_ context.Context, req *http.Request) metadata.MD {
 	md := make(map[string]string)
-	md[internal.GrpcGatewayUri] = req.URL.RequestURI()
-	md[internal.GrpcGatewayMethod] = req.Method
-	md[internal.GrpcGatewayProto] = req.Proto
+	md[constant.GrpcGatewayUri] = req.URL.RequestURI()
+	md[constant.GrpcGatewayMethod] = req.Method
+	md[constant.GrpcGatewayProto] = req.Proto
 
 	return metadata.New(md)
 }

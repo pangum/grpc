@@ -7,7 +7,7 @@ import (
 
 	"github.com/goexl/gox"
 	"github.com/goexl/gox/field"
-	"github.com/pangum/grpc/internal"
+	"github.com/pangum/grpc/internal/internal/constant"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 	"google.golang.org/grpc"
@@ -15,7 +15,7 @@ import (
 
 func (s *Server) handler(grpc *grpc.Server, gateway http.Handler) (handler http.Handler) {
 	combine := s.combine(grpc, gateway)
-	handler = gox.Ift(s.config.CorsEnabled(), s.cors(combine), combine)
+	handler = gox.Ift(s.config.Gateway.CorsEnabled(), s.cors(combine), combine)
 
 	return
 }
@@ -23,7 +23,7 @@ func (s *Server) handler(grpc *grpc.Server, gateway http.Handler) (handler http.
 func (s *Server) combine(grpc *grpc.Server, gateway http.Handler) http.Handler {
 	return h2c.NewHandler(http.HandlerFunc(func(rsp http.ResponseWriter, req *http.Request) {
 		s.logger.Debug("收到请求", s.fields(req)...)
-		if req.ProtoMajor >= 2 && internal.GrpcHeaderValue == req.Header.Get(internal.HeaderContentType) {
+		if req.ProtoMajor >= 2 && constant.GrpcHeaderValue == req.Header.Get(constant.HeaderContentType) {
 			grpc.ServeHTTP(rsp, req)
 		} else {
 			s.addRawType(req)
@@ -35,14 +35,14 @@ func (s *Server) combine(grpc *grpc.Server, gateway http.Handler) http.Handler {
 func (s *Server) cors(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(rsp http.ResponseWriter, req *http.Request) {
 		// 设置允许跨域访问的源
-		rsp.Header().Set(internal.HeaderAllowOrigin, strings.Join(s.config.Cors.Allows, internal.Comma))
+		rsp.Header().Set(constant.HeaderAllowOrigin, strings.Join(s.config.Gateway.Cors.Allows, constant.Comma))
 		// 设置允许的请求方法
-		rsp.Header().Set(internal.HeaderAllowMethods, strings.Join(s.config.Cors.Methods, internal.Comma))
+		rsp.Header().Set(constant.HeaderAllowMethods, strings.Join(s.config.Gateway.Cors.Methods, constant.Comma))
 		// 设置允许的请求头
-		rsp.Header().Set(internal.HeaderAllowHeaders, strings.Join(s.config.Cors.Headers, internal.Comma))
+		rsp.Header().Set(constant.HeaderAllowHeaders, strings.Join(s.config.Gateway.Cors.Headers, constant.Comma))
 
 		// 如果是预检请求，直接返回
-		if req.Method == internal.MethodOptions {
+		if req.Method == constant.MethodOptions {
 			return
 		}
 
@@ -53,7 +53,7 @@ func (s *Server) cors(handler http.Handler) http.Handler {
 
 func (s *Server) addRawType(request *http.Request) {
 	if nil != request && nil != s.config.Gateway && s.config.Gateway.Body.Check(request.URL.Path) {
-		request.Header.Set(internal.HeaderContentType, internal.RawHeaderValue)
+		request.Header.Set(constant.HeaderContentType, constant.RawHeaderValue)
 	}
 }
 
@@ -68,13 +68,13 @@ func (s *Server) fields(request *http.Request) gox.Fields[any] {
 }
 
 func (s *Server) ip(req *http.Request) (ip string) {
-	ip = req.Header.Get(internal.HeaderXRealIp)
+	ip = req.Header.Get(constant.HeaderXRealIp)
 	if netIp := net.ParseIP(ip); nil != netIp {
 		return
 	}
 
-	ips := req.Header.Get(internal.HeaderXForwardedFor)
-	for _, _ip := range strings.Split(ips, internal.Comma) {
+	ips := req.Header.Get(constant.HeaderXForwardedFor)
+	for _, _ip := range strings.Split(ips, constant.Comma) {
 		ip = _ip
 		if netIP := net.ParseIP(ip); nil != netIP {
 			return
