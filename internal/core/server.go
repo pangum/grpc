@@ -46,22 +46,24 @@ func (s *Server) Serve(register Register) (err error) {
 		reflection.Register(s.rpc)
 	}
 
-	if listener, le := net.Listen(constant.Tcp, s.config.Server.Addr()); nil != le {
+	if rpc, gateway, le := s.listeners(); nil != le {
 		err = le
-	} else if gre := s.grpc(register); nil != gre {
+	} else if gre := s.grpc(register, rpc); nil != gre {
 		err = gre
 	} else if gwe := s.gateway(register); nil != gwe {
 		err = gwe
 	} else {
-		err = s.startup(listener)
+		err = s.startup(gateway)
 	}
 
 	return
 }
 
-func (s *Server) Stop() {
+func (s *Server) Stop() (err error) {
 	s.rpc.GracefulStop()
-	_ = s.http.Shutdown(context.Background())
+	err = s.http.Shutdown(context.Background())
+
+	return
 }
 
 func (s *Server) startup(listener net.Listener) (err error) {
@@ -72,7 +74,7 @@ func (s *Server) startup(listener net.Listener) (err error) {
 	s.http.ReadHeaderTimeout = s.config.Gateway.Timeout.Header
 
 	fields := gox.Fields[any]{
-		field.New("port.rpc", s.config.Server.Port),
+		field.New("port.grpc", s.config.Server.Port),
 	}
 	if s.config.Gateway.Enable() {
 		fields = append(fields, field.New("port.gateway", s.config.Gateway.Port))
@@ -83,8 +85,35 @@ func (s *Server) startup(listener net.Listener) (err error) {
 	return
 }
 
-func (s *Server) grpc(register Register) (err error) {
+func (s *Server) grpc(register Register, listener net.Listener) (err error) {
 	register.Grpc(s.rpc)
+	if nil == s.config.Gateway || (s.config.Gateway.Enable() && s.diff()) {
+		go s.serveRpc(listener)
+	}
+
+	return
+}
+
+func (s *Server) serveRpc(listener net.Listener) {
+	if err := s.rpc.Serve(listener); nil != err {
+		s.logger.Error("启动gRPC出错", field.New("addr", s.config.Server.Addr()))
+	}
+}
+
+func (s *Server) diff() bool {
+	return s.config.Gateway.Port != s.config.Server.Port
+}
+
+func (s *Server) listeners() (rpc net.Listener, gateway net.Listener, err error) {
+	if listener, re := net.Listen(constant.Tcp, s.config.Server.Addr()); nil != re { // gRPC端口必须监听
+		err = re
+	} else if nil != s.config.Gateway && s.config.Gateway.Enable() && s.diff() { // 如果网关开启且端口不一样
+		rpc = listener
+		gateway, err = net.Listen(constant.Tcp, s.config.Gateway.Addr())
+	} else { // 其它情况，监听端口都是一样的
+		rpc = listener
+		gateway = listener
+	}
 
 	return
 }

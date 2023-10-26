@@ -8,4 +8,4 @@ import (
 )
 
 // Handler 端点注册方法
-type Handler func(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) error
+type Handler func(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error

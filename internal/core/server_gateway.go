@@ -37,30 +37,32 @@ func (s *Server) gateway(register Register) (err error) {
 		gatewayOpts = append(gatewayOpts, runtime.WithUnescapingMode(s.config.Gateway.Unescape.Mode))
 	}
 
-	_gateway := runtime.NewServeMux(gatewayOpts...)
-	grpcOpts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
-	if ge := s.registerGateway(register, _gateway, s.config.Gateway.Addr(), &grpcOpts); nil != ge {
+	gw := runtime.NewServeMux(gatewayOpts...)
+	grpcOpts := []grpc.DialOption{grpc.WithBlock(), grpc.WithTransportCredentials(insecure.NewCredentials())}
+	ctx, handlers := register.Gateway(gw, &grpcOpts)
+	if connection, dce := grpc.DialContext(ctx, s.config.Server.Addr(), grpcOpts...); nil != dce {
+		err = dce
+	} else if ge := s.registerGateway(ctx, gw, connection, handlers); nil != ge {
 		err = ge
 	} else if "" == s.config.Gateway.Path {
-		s.mux.Handle(constant.Slash, _gateway)
+		s.mux.Handle(constant.Slash, gw)
 	} else {
 		path := s.config.Gateway.Path
-		s.mux.Handle(gox.StringBuilder(path, constant.Slash).String(), http.StripPrefix(path, _gateway))
+		s.mux.Handle(gox.StringBuilder(path, constant.Slash).String(), http.StripPrefix(path, gw))
 	}
 
 	return
 }
 
 func (s *Server) registerGateway(
-	register Register,
-	mux *runtime.ServeMux,
-	endpoint string, options *[]grpc.DialOption,
+	ctx context.Context,
+	mux *runtime.ServeMux, connection *grpc.ClientConn,
+	handlers []Handler,
 ) (err error) {
-	ctx, handlers := register.Gateway(mux, options)
 	for _, handler := range handlers {
-		if re := handler(ctx, mux, endpoint, *options); nil != re {
-			err = re
-			s.logger.Warn("注册网关出错", field.New("func", handler), field.Error(re))
+		if he := handler(ctx, mux, connection); nil != he {
+			err = he
+			s.logger.Warn("注册网关出错", field.New("func", handler), field.Error(he))
 		}
 		if nil != err {
 			break

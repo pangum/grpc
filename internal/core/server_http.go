@@ -14,8 +14,8 @@ import (
 )
 
 func (s *Server) handler(grpc *grpc.Server, gateway http.Handler) (handler http.Handler) {
-	combine := s.combine(grpc, gateway)
-	handler = gox.Ift(s.config.Gateway.CorsEnabled(), s.cors(combine), combine)
+	handler = gox.Ift(s.diff(), gateway, s.combine(grpc, gateway))
+	handler = gox.Ift(s.config.Gateway.CorsEnabled(), s.cors(handler), handler)
 
 	return
 }
