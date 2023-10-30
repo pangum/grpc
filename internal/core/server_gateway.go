@@ -40,7 +40,7 @@ func (s *Server) setupGateway(register Register, listener net.Listener) (err err
 
 	gw := runtime.NewServeMux(gatewayOpts...)
 	grpcOpts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
-	if s.diff() { // 在
+	if s.diff() { // 在端口配置不同时需要阻塞直到启动完成
 		grpcOpts = append(grpcOpts, grpc.WithBlock())
 	}
 	ctx, handlers := register.Gateway(gw, &grpcOpts)

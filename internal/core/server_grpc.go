@@ -15,6 +15,7 @@ func (s *Server) setupGrpc(register Register, listener net.Listener) (err error)
 	}
 	s.logger.Info("启动服务成功", fields...)
 	if nil == s.config.Gateway || (s.gatewayEnabled() && s.diff()) {
+		s.wait.Add(1)
 		go s.serveRpc(listener, &fields)
 	}
 
@@ -22,6 +23,8 @@ func (s *Server) setupGrpc(register Register, listener net.Listener) (err error)
 }
 
 func (s *Server) serveRpc(listener net.Listener, fields *gox.Fields[any]) {
+	defer s.wait.Done()
+
 	if err := s.rpc.Serve(listener); nil != err {
 		s.logger.Error("启动服务出错", fields.Add(field.Error(err))...)
 	}

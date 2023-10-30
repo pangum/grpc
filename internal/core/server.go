@@ -4,6 +4,7 @@ import (
 	"context"
 	"net"
 	"net/http"
+	"sync"
 
 	"github.com/goexl/gox"
 	"github.com/goexl/log"
@@ -20,6 +21,7 @@ type Server struct {
 	http *http.Server
 	mux  *http.ServeMux
 
+	wait   *sync.WaitGroup
 	config *internal.Config
 	logger log.Logger
 	_      gox.CannotCopy
@@ -35,6 +37,7 @@ func NewServer(
 		rpc: rpc,
 		mux: mux,
 
+		wait:   new(sync.WaitGroup),
 		config: internal.NewConfig(server, gateway),
 		logger: logger,
 	}
@@ -52,13 +55,16 @@ func (s *Server) Serve(register Register) (err error) {
 	} else if gwe := s.setupGateway(register, gateway); nil != gwe {
 		err = gwe
 	}
+	s.wait.Wait()
 
 	return
 }
 
-func (s *Server) Stop() (err error) {
+func (s *Server) Stop(ctx context.Context) (err error) {
 	s.rpc.GracefulStop()
-	err = s.http.Shutdown(context.Background())
+	if nil != s.http {
+		err = s.http.Shutdown(ctx)
+	}
 
 	return
 }
