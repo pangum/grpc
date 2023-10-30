@@ -19,10 +19,10 @@ func (r *Register) Gateway(_ *runtime.ServeMux, _ *[]grpc.DialOption) (ctx conte
 	return
 }
 
-func (r *Register) Before() (err error) {
+func (r *Register) Before(_ context.Context) (err error) {
 	return
 }
 
-func (r *Register) After() (err error) {
+func (r *Register) After(_ context.Context) (err error) {
 	return
 }
