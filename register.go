@@ -11,7 +11,9 @@ import (
 var _ core.Register = (*Register)(nil)
 
 // Register 空白注册器
-type Register struct{}
+type Register struct {
+	// 实现默认的生命周期方法
+}
 
 func (r *Register) Grpc(_ *grpc.Server) {}
 
