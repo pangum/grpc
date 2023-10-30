@@ -12,6 +12,8 @@ import (
 type Gateway struct {
 	// 是否开启
 	Enabled *bool `default:"true" json:"enabled" yaml:"enabled" xml:"enabled" toml:"enabled"`
+	// 名字
+	Name string `default:"网关" json:"name" yaml:"name" xml:"name" toml:"name"`
 	// 绑定监听主机
 	Host string `json:"host" yaml:"host" xml:"host" toml:"host"`
 	// 绑定监听端口

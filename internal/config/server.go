@@ -5,6 +5,8 @@ import (
 )
 
 type Server struct {
+	// 名字
+	Name string `default:"gRPC" json:"name" yaml:"name" xml:"name" toml:"name"`
 	// 绑定监听主机
 	Host string `json:"host" yaml:"host" xml:"host" toml:"host"`
 	// 绑定监听端口

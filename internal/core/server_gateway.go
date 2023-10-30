@@ -3,6 +3,7 @@ package core
 import (
 	"context"
 	"fmt"
+	"net"
 	"net/http"
 	"strconv"
 	"strings"
@@ -19,8 +20,8 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-func (s *Server) gateway(register Register) (err error) {
-	if !s.config.Gateway.Enable() {
+func (s *Server) setupGateway(register Register, listener net.Listener) (err error) {
+	if !s.gatewayEnabled() {
 		return
 	}
 
@@ -38,7 +39,10 @@ func (s *Server) gateway(register Register) (err error) {
 	}
 
 	gw := runtime.NewServeMux(gatewayOpts...)
-	grpcOpts := []grpc.DialOption{grpc.WithBlock(), grpc.WithTransportCredentials(insecure.NewCredentials())}
+	grpcOpts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
+	if s.diff() { // 在
+		grpcOpts = append(grpcOpts, grpc.WithBlock())
+	}
 	ctx, handlers := register.Gateway(gw, &grpcOpts)
 	if connection, dce := grpc.DialContext(ctx, s.config.Server.Addr(), grpcOpts...); nil != dce {
 		err = dce
@@ -50,6 +54,26 @@ func (s *Server) gateway(register Register) (err error) {
 		path := s.config.Gateway.Path
 		s.mux.Handle(gox.StringBuilder(path, constant.Slash).String(), http.StripPrefix(path, gw))
 	}
+	if nil == err {
+		err = s.serveGateway(listener)
+	}
+
+	return
+}
+
+func (s *Server) serveGateway(listener net.Listener) (err error) {
+	s.http = new(http.Server)
+	s.http.Addr = s.config.Gateway.Addr()
+	s.http.Handler = s.handler(s.rpc, s.mux)
+	s.http.ReadTimeout = s.config.Gateway.Timeout.Read
+	s.http.ReadHeaderTimeout = s.config.Gateway.Timeout.Header
+
+	fields := gox.Fields[any]{
+		field.New("name", s.config.Gateway.Name),
+		field.New("addr", s.config.Gateway.Addr()),
+	}
+	s.logger.Info("启动服务成功", fields...)
+	err = s.http.Serve(listener)
 
 	return
 }
