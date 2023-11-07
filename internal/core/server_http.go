@@ -14,8 +14,12 @@ import (
 )
 
 func (s *Server) handler(grpc *grpc.Server, gateway http.Handler) (handler http.Handler) {
-	handler = gox.Ift(s.diff(), gateway, s.combine(grpc, gateway))
+	// 增加原始数据解析
+	handler = s.raw(gateway)
+	// 处理跨域
 	handler = gox.Ift(s.config.Gateway.CorsEnabled(), s.cors(handler), handler)
+	// 如果端口配置为一样，需要合并处理
+	handler = gox.Ift(s.diff(), handler, s.combine(grpc, handler))
 
 	return
 }
@@ -26,7 +30,6 @@ func (s *Server) combine(grpc *grpc.Server, gateway http.Handler) http.Handler {
 		if req.ProtoMajor >= 2 && constant.GrpcHeaderValue == req.Header.Get(constant.HeaderContentType) {
 			grpc.ServeHTTP(rsp, req)
 		} else {
-			s.addRawType(req)
 			gateway.ServeHTTP(rsp, req)
 		}
 	}), new(http2.Server))
@@ -51,10 +54,15 @@ func (s *Server) cors(handler http.Handler) http.Handler {
 	})
 }
 
-func (s *Server) addRawType(request *http.Request) {
-	if nil != request && nil != s.config.Gateway && s.config.Gateway.Body.Check(request.URL.Path) {
-		request.Header.Set(constant.HeaderContentType, constant.RawHeaderValue)
-	}
+func (s *Server) raw(handler http.Handler) http.Handler {
+	return http.HandlerFunc(func(rsp http.ResponseWriter, req *http.Request) {
+		if nil != req && nil != s.config.Gateway && s.config.Gateway.Body.Check(req.URL.Path) {
+			req.Header.Set(constant.HeaderContentType, constant.RawHeaderValue)
+		}
+
+		// 调用实际的处理器函数
+		handler.ServeHTTP(rsp, req)
+	})
 }
 
 func (s *Server) fields(request *http.Request) gox.Fields[any] {
