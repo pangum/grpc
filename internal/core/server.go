@@ -21,10 +21,11 @@ type Server struct {
 	http *http.Server
 	mux  *http.ServeMux
 
-	wait   *sync.WaitGroup
-	config *internal.Config
-	logger log.Logger
-	_      gox.CannotCopy
+	wait       *sync.WaitGroup
+	config     *internal.Config
+	rpcStarted bool
+	logger     log.Logger
+	_          gox.CannotCopy
 }
 
 func NewServer(
