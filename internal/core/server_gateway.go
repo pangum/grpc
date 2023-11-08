@@ -44,6 +44,9 @@ func (s *Server) setupGateway(register Register, listener net.Listener) (err err
 	if s.rpcStarted && !s.diffPort() {
 		grpcOpts = append(grpcOpts, grpc.WithBlock())
 	}
+	if nil == ctx {
+		ctx = context.Background()
+	}
 	if connection, dce := grpc.DialContext(ctx, s.config.Server.Addr(), grpcOpts...); nil != dce {
 		err = dce
 	} else if ge := s.registerGateway(ctx, gw, connection, handlers); nil != ge {
