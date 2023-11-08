@@ -18,6 +18,8 @@ type Register struct {
 func (r *Register) Grpc(_ *grpc.Server) {}
 
 func (r *Register) Gateway(_ *runtime.ServeMux, _ *[]grpc.DialOption) (ctx context.Context, handlers core.Handlers) {
+	ctx = context.Background()
+
 	return
 }
 
