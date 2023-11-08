@@ -69,14 +69,14 @@ func (s *Server) Stop(ctx context.Context) (err error) {
 	return
 }
 
-func (s *Server) diff() bool {
+func (s *Server) diffPort() bool {
 	return s.config.Gateway.Port != s.config.Server.Port
 }
 
 func (s *Server) listeners() (rpc net.Listener, gateway net.Listener, err error) {
 	if listener, re := net.Listen(constant.Tcp, s.config.Server.Addr()); nil != re { // gRPC端口必须监听
 		err = re
-	} else if s.gatewayEnabled() && s.diff() { // 如果网关开启且端口不一样
+	} else if s.gatewayEnabled() && s.diffPort() { // 如果网关开启且端口不一样
 		rpc = listener
 		gateway, err = net.Listen(constant.Tcp, s.config.Gateway.Addr())
 	} else { // 其它情况，监听端口都是一样的

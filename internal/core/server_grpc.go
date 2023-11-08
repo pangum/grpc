@@ -14,7 +14,7 @@ func (s *Server) setupGrpc(register Register, listener net.Listener) (err error)
 		field.New("addr", s.config.Server.Addr()),
 	}
 	s.logger.Info("启动服务成功", fields...)
-	if nil == s.config.Gateway || (s.gatewayEnabled() && s.diff()) {
+	if nil == s.config.Gateway || (s.gatewayEnabled() && s.diffPort()) {
 		s.wait.Add(1)
 		go s.serveRpc(listener, &fields)
 	}

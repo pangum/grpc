@@ -19,7 +19,7 @@ func (s *Server) handler(grpc *grpc.Server, gateway http.Handler) (handler http.
 	// 处理跨域
 	handler = gox.Ift(s.config.Gateway.CorsEnabled(), s.cors(handler), handler)
 	// 如果端口配置为一样，需要合并处理
-	handler = gox.Ift(s.diff(), handler, s.combine(grpc, handler))
+	handler = gox.Ift(s.diffPort(), handler, s.combine(grpc, handler))
 
 	return
 }
