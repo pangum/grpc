@@ -11,11 +11,11 @@ import (
 	"google.golang.org/grpc/keepalive"
 )
 
-type Creator struct {
+type Constructor struct {
 	// 解决命名空间问题
 }
 
-func (c *Creator) New(config *pangu.Config, logger log.Logger) (server *core.Server, mux *http.ServeMux, err error) {
+func (c *Constructor) New(config *pangu.Config, logger log.Logger) (server *core.Server, mux *http.ServeMux, err error) {
 	wrapper := new(Wrapper)
 	if ge := config.Build().Get(wrapper); nil != ge {
 		err = ge
@@ -26,7 +26,7 @@ func (c *Creator) New(config *pangu.Config, logger log.Logger) (server *core.Ser
 	return
 }
 
-func (c *Creator) NewClient(config *pangu.Config) (client *core.Client, err error) {
+func (c *Constructor) NewClient(config *pangu.Config) (client *core.Client, err error) {
 	wrapper := new(Wrapper)
 	if ge := config.Build().Get(wrapper); nil != ge {
 		err = ge
@@ -37,7 +37,7 @@ func (c *Creator) NewClient(config *pangu.Config) (client *core.Client, err erro
 	return
 }
 
-func (c *Creator) new(config *Config, logger log.Logger) (server *core.Server, mux *http.ServeMux, err error) {
+func (c *Constructor) new(config *Config, logger log.Logger) (server *core.Server, mux *http.ServeMux, err error) {
 	if nil == config.Server {
 		return
 	}
@@ -62,7 +62,7 @@ func (c *Creator) new(config *Config, logger log.Logger) (server *core.Server, m
 	return
 }
 
-func (c *Creator) newClient(config *Config) (client *core.Client, err error) {
+func (c *Constructor) newClient(config *Config) (client *core.Client, err error) {
 	if 0 == len(config.Clients) {
 		return
 	}
