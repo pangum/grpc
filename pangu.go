@@ -6,9 +6,10 @@ import (
 )
 
 func init() {
-	creator := new(plugin.Constructor)
+	ctor := new(plugin.Constructor)
 	pangu.New().Get().Dependency().Put(
-		creator.New,
-		creator.NewClient,
+		ctor.New,
+		ctor.NewClient,
+		ctor.NewGateway,
 	).Build().Build().Apply()
 }

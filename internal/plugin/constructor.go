@@ -37,6 +37,10 @@ func (c *Constructor) NewClient(config *pangu.Config) (client *core.Client, err 
 	return
 }
 
+func (c *Constructor) NewGateway(logger log.Logger) *core.Gateway {
+	return core.NewGateway(logger)
+}
+
 func (c *Constructor) new(config *Config, logger log.Logger) (server *core.Server, mux *http.ServeMux, err error) {
 	if nil == config.Server {
 		return
