@@ -53,3 +53,7 @@ func (g *Gateway) NewServerError(err error) error {
 func (g *Gateway) NewServerException(exception exc.Exception) error {
 	return g.NewException(http.StatusInternalServerError, exception)
 }
+
+func (g *Gateway) NewNotfoundError(err error) error {
+	return g.NewError(http.StatusNotFound, err)
+}
