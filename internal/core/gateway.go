@@ -42,7 +42,7 @@ func (g *Gateway) ServerError(err error) error {
 	return g.error(http.StatusInternalServerError, err)
 }
 
-func (g *Gateway) ServerException(code int, fields gox.Fields[any]) (err error) {
+func (g *Gateway) ServerException(code int, fields ...gox.Field[any]) (err error) {
 	exception := exc.NewException(code, "服务器错误，客户端需要根据返回中的`code`码来确认具体是什么错误", fields...)
 	err = g.exception(http.StatusInternalServerError, exception)
 
