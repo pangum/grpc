@@ -132,9 +132,13 @@ func (s *Server) error(
 	writer http.ResponseWriter, _ *http.Request,
 	err error,
 ) {
-	writer.WriteHeader(http.StatusInternalServerError)
 	if _status, ok := status.FromError(err); ok {
+		writer.WriteHeader(int(_status.Code()))
 		bytes := []byte(_status.Message())
+		_, _ = writer.Write(bytes)
+	} else {
+		writer.WriteHeader(http.StatusInternalServerError)
+		bytes := []byte(err.Error())
 		_, _ = writer.Write(bytes)
 	}
 }
