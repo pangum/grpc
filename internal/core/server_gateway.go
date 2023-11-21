@@ -140,11 +140,14 @@ func (s *Server) error(
 }
 
 func (s *Server) header(ctx context.Context, writer http.ResponseWriter, _ proto.Message) (err error) {
-	var header metadata.MD
 	if md, ok := runtime.ServerMetadataFromContext(ctx); ok {
-		header = md.HeaderMD
+		s.resetHeader(md.HeaderMD, writer)
 	}
 
+	return
+}
+
+func (s *Server) resetHeader(header metadata.MD, writer http.ResponseWriter) {
 	for key, value := range header {
 		if constant.HttpStatusHeader == key { // 不处理设置状态码的逻辑，由状态码设置逻辑特殊处理
 			continue
@@ -160,8 +163,6 @@ func (s *Server) header(ctx context.Context, writer http.ResponseWriter, _ proto
 			writer.Header().Del(fmt.Sprintf(constant.GrpcMetadataFormatter, key))
 		}
 	}
-
-	return
 }
 
 func (s *Server) in(key string) (new string, match bool) {

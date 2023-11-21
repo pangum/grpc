@@ -15,7 +15,7 @@ import (
 
 func (s *Server) handler(grpc *grpc.Server, gateway http.Handler) (handler http.Handler) {
 	// 增加原始数据解析
-	handler = s.raw(gateway)
+	handler = s.handle(gateway)
 	// 处理跨域
 	handler = gox.Ift(s.config.Gateway.CorsEnabled(), s.cors(handler), handler)
 	// 如果端口配置为一样，需要合并处理
@@ -54,24 +54,34 @@ func (s *Server) cors(handler http.Handler) http.Handler {
 	})
 }
 
-func (s *Server) raw(handler http.Handler) http.Handler {
+func (s *Server) handle(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(rsp http.ResponseWriter, req *http.Request) {
+		// 处理原始数据
 		if nil != req && nil != s.config.Gateway && s.config.Gateway.Body.Check(req.URL.Path) {
 			req.Header.Set(constant.HeaderContentType, constant.RawHeaderValue)
 		}
 
+		// 处理保留头
+		s.reserves(rsp, req)
 		// 调用实际的处理器函数
 		handler.ServeHTTP(rsp, req)
 	})
 }
 
-func (s *Server) fields(request *http.Request) gox.Fields[any] {
-	return gox.Fields[any]{
-		field.New("method", request.Method),
-		field.New("url", request.URL.String()),
-		field.New("ip", s.ip(request)),
-		field.New("useragent", request.UserAgent()),
-		field.New("referer", request.Referer()),
+func (s *Server) reserves(rsp http.ResponseWriter, req *http.Request) {
+	header := rsp.Header()
+	for key, value := range req.Header {
+		s.reserve(&header, key, value)
+	}
+}
+
+func (s *Server) reserve(header *http.Header, key string, values []string) {
+	if _, test := s.config.Gateway.Header.TestReserves(key); !test {
+		return
+	}
+
+	for _, value := range values {
+		header.Set(key, value)
 	}
 }
 
@@ -96,4 +106,14 @@ func (s *Server) ip(req *http.Request) (ip string) {
 	}
 
 	return
+}
+
+func (s *Server) fields(request *http.Request) gox.Fields[any] {
+	return gox.Fields[any]{
+		field.New("method", request.Method),
+		field.New("url", request.URL.String()),
+		field.New("ip", s.ip(request)),
+		field.New("useragent", request.UserAgent()),
+		field.New("referer", request.Referer()),
+	}
 }

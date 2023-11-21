@@ -14,9 +14,13 @@ type Header struct {
 	Ins []Matcher `json:"ins" yaml:"ins" xml:"ins" toml:"ins"`
 	// 输出头匹配列表
 	Outs []Matcher `json:"outs" yaml:"outs" xml:"outs" toml:"outs"`
+	// 保留
+	// 符合要求的请求头，会在返回时原样返回
+	Reserves []Matcher `json:"reserves" yaml:"reserves" xml:"reserves" toml:"reserves"`
 
-	DefaultRemoves []Remove  `default:"[{'prefix': 'http-'}]"`
-	DefaultIns     []Matcher `default:"[{'prefix': 'x-forwarded'}]"`
+	DefaultRemoves  []Remove  `default:"[{'prefix': 'http-'}]"`
+	DefaultIns      []Matcher `default:"[{'prefix': 'x-forwarded'}]"`
+	DefaultReserves []Matcher `default:"[{'prefix': 'internal-'}]"`
 }
 
 func (h *Header) TestRemove(key string) (new string, match bool) {
@@ -44,6 +48,14 @@ func (h *Header) TestIns(key string) (new string, match bool) {
 
 func (h *Header) TestOuts(key string) (new string, match bool) {
 	return h.match(h.Outs, key)
+}
+
+func (h *Header) TestReserves(key string) (new string, match bool) {
+	return h.match(gox.Ifx(*h.Default, func() []Matcher {
+		return append(h.DefaultReserves, h.Reserves...)
+	}, func() []Matcher {
+		return h.Reserves
+	}), key)
 }
 
 func (h *Header) match(matchers []Matcher, key string) (new string, match bool) {
