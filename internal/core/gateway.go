@@ -50,10 +50,13 @@ func (g *Gateway) NewServerError(err error) error {
 	return g.NewError(http.StatusInternalServerError, err)
 }
 
-func (g *Gateway) NewServerException(exception exc.Exception) error {
-	return g.NewException(http.StatusInternalServerError, exception)
+func (g *Gateway) NewServerException(code int, fields gox.Fields[any]) (err error) {
+	exception := exc.NewException(code, "服务器错误，客户端需要根据返回中的`code`码来确认具体是什么错误", fields...)
+	err = g.NewException(http.StatusInternalServerError, exception)
+
+	return
 }
 
-func (g *Gateway) NewNotfoundError(err error) error {
-	return g.NewError(http.StatusNotFound, err)
+func (g *Gateway) NewNotfoundError(fields gox.Fields[any]) error {
+	return g.NewError(http.StatusNotFound, exc.NewFields("", fields...))
 }
