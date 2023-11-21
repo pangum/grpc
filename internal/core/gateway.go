@@ -34,29 +34,29 @@ func (g *Gateway) Status(ctx context.Context, code int) {
 	}
 }
 
-func (g *Gateway) NewError(code codes.Code, err error) error {
+func (g *Gateway) Error(code codes.Code, err error) error {
 	return status.Error(code, err.Error())
 }
 
-func (g *Gateway) NewException(code codes.Code, exception exc.Exception) error {
+func (g *Gateway) Exception(code codes.Code, exception exc.Exception) error {
 	return status.Error(code, exception.Error())
 }
 
-func (g *Gateway) NewValidationError(err error) error {
-	return g.NewError(http.StatusBadRequest, err)
+func (g *Gateway) ValidationError(err error) error {
+	return g.Error(http.StatusBadRequest, err)
 }
 
-func (g *Gateway) NewServerError(err error) error {
-	return g.NewError(http.StatusInternalServerError, err)
+func (g *Gateway) ServerError(err error) error {
+	return g.Error(http.StatusInternalServerError, err)
 }
 
-func (g *Gateway) NewServerException(code int, fields gox.Fields[any]) (err error) {
+func (g *Gateway) ServerException(code int, fields gox.Fields[any]) (err error) {
 	exception := exc.NewException(code, "服务器错误，客户端需要根据返回中的`code`码来确认具体是什么错误", fields...)
-	err = g.NewException(http.StatusInternalServerError, exception)
+	err = g.Exception(http.StatusInternalServerError, exception)
 
 	return
 }
 
-func (g *Gateway) NewNotfoundError(fields gox.Fields[any]) error {
-	return g.NewError(http.StatusNotFound, exc.NewFields("", fields...))
+func (g *Gateway) Notfound() error {
+	return g.Error(http.StatusNotFound, exc.NewMessage("未找到资源"))
 }
