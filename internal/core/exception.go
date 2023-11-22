@@ -33,8 +33,8 @@ func (e *Exception) New(code int, fields ...gox.Field[any]) (err error) {
 	return
 }
 
-func (e *Exception) Notfound() error {
-	return e.error(http.StatusNotFound, exception.New().Message("未找到资源").Build())
+func (e *Exception) Notfound(fields ...gox.Field[any]) error {
+	return e.error(http.StatusNotFound, exception.New().Message("未找到资源").Field(fields...).Build())
 }
 
 func (e *Exception) error(code codes.Code, err error) error {
