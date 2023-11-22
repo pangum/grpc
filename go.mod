@@ -4,14 +4,14 @@ go 1.21
 
 require (
 	github.com/goexl/gox v0.3.8
-	github.com/pangum/pangu v0.4.4
+	github.com/pangum/pangu v0.4.5
 	golang.org/x/net v0.18.0
 	google.golang.org/grpc v1.59.0
 	google.golang.org/protobuf v1.31.0
 )
 
 require (
-	github.com/goexl/exc v0.0.5
+	github.com/goexl/exception v0.0.1
 	github.com/goexl/log v0.0.5
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.18.1
 )
@@ -27,8 +27,8 @@ require (
 	github.com/goexl/baozheng v0.0.1 // indirect
 	github.com/goexl/env v0.0.2 // indirect
 	github.com/goexl/gfx v0.1.7 // indirect
-	github.com/goexl/mengpo v0.2.4 // indirect
-	github.com/goexl/xiren v0.0.5 // indirect
+	github.com/goexl/mengpo v0.2.5 // indirect
+	github.com/goexl/xiren v0.0.6 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/uuid v1.4.0 // indirect
 	github.com/kr/text v0.2.0 // indirect

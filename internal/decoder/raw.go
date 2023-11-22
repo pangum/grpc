@@ -5,7 +5,7 @@ import (
 	"io"
 	"reflect"
 
-	"github.com/goexl/exc"
+	"github.com/goexl/exception"
 	"github.com/goexl/gox/field"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 )
@@ -30,9 +30,9 @@ func (r *Raw) NewDecoder(reader io.Reader) runtime.Decoder {
 		if data, re := io.ReadAll(reader); nil != re {
 			err = re
 		} else if value.Kind() != reflect.Ptr {
-			err = exc.NewField("必须是指针类型", field.New("field", fmt.Sprintf("%T", to)))
+			err = exception.New().Message("必须是指针类型").Field(field.New("field", fmt.Sprintf("%T", to))).Build()
 		} else if value = value.Elem(); value.Type() != r.bytesType {
-			err = exc.NewField("必须是二进制数组", field.New("field", fmt.Sprintf("%T", to)))
+			err = exception.New().Message("必须是二进制数组").Field(field.New("field", fmt.Sprintf("%T", to))).Build()
 		} else {
 			value.Set(reflect.ValueOf(data))
 		}

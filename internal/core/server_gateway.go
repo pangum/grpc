@@ -137,7 +137,7 @@ func (s *Server) error(
 		bytes := []byte(_status.Message())
 		_, _ = writer.Write(bytes)
 	} else {
-		writer.WriteHeader(http.StatusInternalServerError)
+		writer.WriteHeader(http.StatusBadGateway)
 		bytes := []byte(err.Error())
 		_, _ = writer.Write(bytes)
 	}
