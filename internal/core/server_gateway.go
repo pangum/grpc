@@ -134,7 +134,10 @@ func (s *Server) error(
 	err error,
 ) {
 	if _status, ok := status.FromError(err); ok {
+		original := _status.Code()
 		code := gox.Ift(codes.Unknown == _status.Code(), http.StatusBadGateway, int(_status.Code()))
+		// ! 修复状态码，避免返回错误的状态吗
+		code = gox.Ift(s.isHttpCode(code), code, runtime.HTTPStatusFromCode(original))
 		writer.WriteHeader(code)
 		bytes := []byte(_status.Message())
 		_, _ = writer.Write(bytes)
@@ -200,4 +203,8 @@ func (s *Server) metadata(_ context.Context, req *http.Request) metadata.MD {
 	md[constant.GrpcGatewayProto] = req.Proto
 
 	return metadata.New(md)
+}
+
+func (s *Server) isHttpCode(code int) bool {
+	return code >= http.StatusContinue && code <= http.StatusNetworkAuthenticationRequired
 }
