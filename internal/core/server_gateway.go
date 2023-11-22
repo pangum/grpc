@@ -14,6 +14,7 @@ import (
 	"github.com/pangum/grpc/internal/decoder"
 	"github.com/pangum/grpc/internal/internal/constant"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
@@ -133,7 +134,8 @@ func (s *Server) error(
 	err error,
 ) {
 	if _status, ok := status.FromError(err); ok {
-		writer.WriteHeader(int(_status.Code()))
+		code := gox.Ift(codes.Unknown == _status.Code(), http.StatusBadGateway, int(_status.Code()))
+		writer.WriteHeader(code)
 		bytes := []byte(_status.Message())
 		_, _ = writer.Write(bytes)
 	} else {
