@@ -10,7 +10,7 @@ import (
 )
 
 type Exception struct {
-	// 异常方法封装
+	_ gox.CannotCopy
 }
 
 func (e *Exception) Invalidation(err error) error {
