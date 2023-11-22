@@ -11,5 +11,6 @@ func init() {
 		ctor.New,
 		ctor.NewClient,
 		ctor.NewGateway,
+		ctor.NewException,
 	).Build().Build().Apply()
 }
