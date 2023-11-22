@@ -13,6 +13,10 @@ type Exception struct {
 	_ gox.CannotCopy
 }
 
+func NewException() *Exception {
+	return new(Exception)
+}
+
 func (e *Exception) Invalidation(err error) error {
 	return e.error(http.StatusBadRequest, err)
 }

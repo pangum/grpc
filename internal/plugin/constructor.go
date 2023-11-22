@@ -41,6 +41,10 @@ func (c *Constructor) NewGateway(logger log.Logger) *core.Gateway {
 	return core.NewGateway(logger)
 }
 
+func (c *Constructor) NewException() *core.Exception {
+	return core.NewException()
+}
+
 func (c *Constructor) new(config *Config, logger log.Logger) (server *core.Server, mux *http.ServeMux, err error) {
 	if nil == config.Server {
 		return
