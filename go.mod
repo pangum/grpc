@@ -12,7 +12,7 @@ require (
 
 require (
 	github.com/goexl/exception v0.0.1
-	github.com/goexl/log v0.0.5
+	github.com/goexl/log v0.0.7
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.18.1
 )
 
