@@ -6,7 +6,7 @@ require (
 	github.com/goexl/gox v0.3.8
 	github.com/pangum/pangu v0.4.5
 	golang.org/x/net v0.21.0
-	google.golang.org/grpc v1.61.1
+	google.golang.org/grpc v1.62.0
 	google.golang.org/protobuf v1.32.0
 )
 
@@ -30,7 +30,7 @@ require (
 	github.com/goexl/mengpo v0.2.5 // indirect
 	github.com/goexl/xiren v0.0.6 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
-	github.com/google/uuid v1.4.0 // indirect
+	github.com/google/uuid v1.6.0 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/leodido/go-urn v1.2.4 // indirect
 	github.com/mattn/go-runewidth v0.0.15 // indirect
