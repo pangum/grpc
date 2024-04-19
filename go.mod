@@ -5,7 +5,7 @@ go 1.21
 require (
 	github.com/goexl/gox v0.3.8
 	github.com/pangum/pangu v0.4.5
-	golang.org/x/net v0.22.0
+	golang.org/x/net v0.23.0
 	google.golang.org/grpc v1.62.1
 	google.golang.org/protobuf v1.33.0
 )
