@@ -35,7 +35,7 @@ func (s *Server) combine(grpc *grpc.Server, gateway http.Handler) http.Handler {
 	}), new(http2.Server))
 }
 
-func (s *Server) cors(handler http.Handler) http.Handler {
+func (s *Server) cors(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(rsp http.ResponseWriter, req *http.Request) {
 		// 设置允许跨域访问的源
 		rsp.Header().Set(constant.HeaderAllowOrigin, strings.Join(s.config.Gateway.Cors.Allows, constant.Comma))
@@ -50,11 +50,11 @@ func (s *Server) cors(handler http.Handler) http.Handler {
 		}
 
 		// 调用实际的处理器函数
-		handler.ServeHTTP(rsp, req)
+		next.ServeHTTP(rsp, req)
 	})
 }
 
-func (s *Server) handle(handler http.Handler) http.Handler {
+func (s *Server) handle(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(rsp http.ResponseWriter, req *http.Request) {
 		// 处理原始数据
 		if nil != req && nil != s.config.Gateway && s.config.Gateway.Body.Check(req.URL.Path) {
@@ -64,7 +64,7 @@ func (s *Server) handle(handler http.Handler) http.Handler {
 		// 处理保留头
 		s.reserves(rsp, req)
 		// 调用实际的处理器函数
-		handler.ServeHTTP(rsp, req)
+		next.ServeHTTP(rsp, req)
 	})
 }
 
