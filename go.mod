@@ -3,8 +3,8 @@ module github.com/pangum/grpc
 go 1.22
 
 require (
-	github.com/goexl/gox v0.4.6
-	github.com/pangum/pangu v0.4.9
+	github.com/goexl/gox v0.5.1
+	github.com/pangum/pangu v0.5.1
 	golang.org/x/net v0.25.0
 	google.golang.org/grpc v1.64.0
 	google.golang.org/protobuf v1.34.1
@@ -23,7 +23,7 @@ require (
 	github.com/gabriel-vasile/mimetype v1.4.4 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
-	github.com/go-playground/validator/v10 v10.20.0 // indirect
+	github.com/go-playground/validator/v10 v10.21.0 // indirect
 	github.com/goexl/baozheng v0.0.1 // indirect
 	github.com/goexl/env v0.0.2 // indirect
 	github.com/goexl/gfx v0.1.7 // indirect

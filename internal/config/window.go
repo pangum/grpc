@@ -7,8 +7,8 @@ import (
 type Window struct {
 	// 初始
 	// 1GB
-	Initial gox.Size `default:"1GB" json:"initial" yaml:"initial" xml:"initial" toml:"initial"`
+	Initial gox.Bytes `default:"1GB" json:"initial" yaml:"initial" xml:"initial" toml:"initial"`
 	// 连接
 	// 1GB
-	Connection gox.Size `default:"1GB" json:"connection" yaml:"connection" xml:"connection" toml:"connection"`
+	Connection gox.Bytes `default:"1GB" json:"connection" yaml:"connection" xml:"connection" toml:"connection"`
 }
