@@ -5,7 +5,7 @@ go 1.22
 require (
 	github.com/goexl/gox v0.5.1
 	github.com/pangum/pangu v0.5.1
-	golang.org/x/net v0.26.0
+	golang.org/x/net v0.27.0
 	google.golang.org/grpc v1.65.0
 	google.golang.org/protobuf v1.34.2
 )
@@ -43,8 +43,8 @@ require (
 	github.com/xrash/smetrics v0.0.0-20240521201337-686a1a2994c1 // indirect
 	github.com/zs5460/art v0.3.0 // indirect
 	go.uber.org/dig v1.17.1 // indirect
-	golang.org/x/crypto v0.24.0 // indirect
-	golang.org/x/sys v0.21.0 // indirect
+	golang.org/x/crypto v0.25.0 // indirect
+	golang.org/x/sys v0.22.0 // indirect
 	golang.org/x/text v0.16.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20240528184218-531527333157 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240528184218-531527333157 // indirect
