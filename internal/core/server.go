@@ -25,7 +25,7 @@ type Server struct {
 	config     *internal.Config
 	rpcStarted bool
 	logger     log.Logger
-	_          gox.CannotCopy
+	_          gox.Pointerized
 }
 
 func NewServer(

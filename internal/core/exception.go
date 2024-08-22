@@ -10,7 +10,7 @@ import (
 )
 
 type Exception struct {
-	_ gox.CannotCopy
+	_ gox.Pointerized
 }
 
 func NewException() *Exception {

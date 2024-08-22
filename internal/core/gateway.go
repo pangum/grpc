@@ -14,7 +14,7 @@ import (
 
 type Gateway struct {
 	logger log.Logger
-	_      gox.CannotCopy
+	_      gox.Pointerized
 }
 
 func NewGateway(logger log.Logger) *Gateway {

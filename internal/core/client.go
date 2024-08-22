@@ -9,7 +9,7 @@ import (
 type Client struct {
 	connections map[string]*grpc.ClientConn
 
-	_ gox.CannotCopy
+	_ gox.Pointerized
 }
 
 func NewClient(connections map[string]*grpc.ClientConn) *Client {
