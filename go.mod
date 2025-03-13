@@ -4,7 +4,7 @@ go 1.23
 require (
 	github.com/goexl/gox v1.9.0
 	github.com/pangum/pangu v1.5.6
-	golang.org/x/net v0.36.0
+	golang.org/x/net v0.37.0
 	google.golang.org/grpc v1.68.0
 	google.golang.org/protobuf v1.35.1
 )
@@ -42,9 +42,9 @@ require (
 	github.com/xrash/smetrics v0.0.0-20240521201337-686a1a2994c1 // indirect
 	github.com/zs5460/art v0.3.0 // indirect
 	go.uber.org/dig v1.18.0 // indirect
-	golang.org/x/crypto v0.35.0 // indirect
-	golang.org/x/sys v0.30.0 // indirect
-	golang.org/x/text v0.22.0 // indirect
+	golang.org/x/crypto v0.36.0 // indirect
+	golang.org/x/sys v0.31.0 // indirect
+	golang.org/x/text v0.23.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20241104194629-dd2ea8efbc28 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20241104194629-dd2ea8efbc28 // indirect
 )
