@@ -2,7 +2,7 @@ module github.com/pangum/grpc
 
 go 1.23
 require (
-	github.com/goexl/gox v1.9.0
+	github.com/goexl/gox v1.9.2
 	github.com/pangum/pangu v1.5.6
 	golang.org/x/net v0.36.0
 	google.golang.org/grpc v1.68.0
