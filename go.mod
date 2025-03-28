@@ -1,12 +1,10 @@
 module github.com/pangum/grpc
 
 go 1.23
-toolchain go1.24.1
-
 require (
 	github.com/goexl/gox v1.9.2
 	github.com/pangum/pangu v1.5.9
-	golang.org/x/net v0.37.0
+	golang.org/x/net v0.38.0
 	google.golang.org/grpc v1.71.0
 	google.golang.org/protobuf v1.36.6
 )
