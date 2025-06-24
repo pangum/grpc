@@ -15,7 +15,7 @@ require (
 require (
 	github.com/goexl/exception v0.0.4
 	github.com/goexl/log v0.1.0
-	github.com/grpc-ecosystem/grpc-gateway/v2 v2.27.0
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.27.1
 )
 
 require (
