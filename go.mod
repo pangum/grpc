@@ -9,7 +9,7 @@ require (
 	github.com/pangum/pangu v1.6.3
 	golang.org/x/net v0.47.0
 	google.golang.org/grpc v1.75.0
-	google.golang.org/protobuf v1.36.8
+	google.golang.org/protobuf v1.36.10
 )
 
 require (
