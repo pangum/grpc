@@ -1,19 +1,16 @@
 module github.com/pangum/grpc
 
-go 1.25.0
+go 1.27
 
 require (
-	github.com/goexl/gox v1.9.2
+	github.com/goexl/exception v0.0.4
+	github.com/goexl/gox v1.9.3
+	github.com/goexl/log v0.1.0
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.30.0
 	github.com/pangum/pangu v1.6.3
 	golang.org/x/net v0.58.0
 	google.golang.org/grpc v1.83.2
 	google.golang.org/protobuf v1.36.12
-)
-
-require (
-	github.com/goexl/exception v0.0.4
-	github.com/goexl/log v0.1.0
-	github.com/grpc-ecosystem/grpc-gateway/v2 v2.30.0
 )
 
 require (
